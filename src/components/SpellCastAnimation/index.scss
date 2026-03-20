@@ -1,0 +1,327 @@
+// 施咒动画 - 施展记账咒
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.spell-cast-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(25, 25, 112, 0.95); // 深夜蓝
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: spellFadeIn 0.3s ease;
+
+  // 背景光晕
+  .spell-bg-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle,
+      rgba(201, 162, 39, 0.3) 0%,
+      rgba(114, 47, 55, 0.2) 30%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    animation: bgGlow 1.5s ease-in-out infinite;
+  }
+
+  // 魔杖
+  .wand-container {
+    position: relative;
+    width: 200px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .wand {
+      position: relative;
+      width: 12px;
+      height: 180px;
+      transform: rotate(-45deg);
+      animation: wandSwipe 1.5s ease-in-out;
+
+      .wand-tip {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-bottom: 30px solid #c9a227;
+        filter: drop-shadow(0 0 10px rgba(201, 162, 39, 0.8));
+      }
+
+      .wand-shaft {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 140px;
+        background: linear-gradient(180deg,
+          #2d1810 0%,
+          #4a3020 50%,
+          #2d1810 100%
+        );
+        border-radius: 4px;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 20px;
+          left: -2px;
+          right: -2px;
+          height: 8px;
+          background: #c9a227;
+          border-radius: 2px;
+        }
+      }
+
+      .wand-handle {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 16px;
+        height: 40px;
+        background: linear-gradient(180deg, #4a3020, #2d1810);
+        border-radius: 0 0 8px 8px;
+      }
+    }
+  }
+
+  // Z字形闪电
+  .lightning-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+
+    .lightning-segment {
+      position: absolute;
+      background: linear-gradient(90deg,
+        rgba(201, 162, 39, 0.8),
+        rgba(255, 255, 255, 0.9)
+      );
+      box-shadow: 0 0 20px rgba(201, 162, 39, 0.8),
+                  0 0 40px rgba(201, 162, 39, 0.4);
+      border-radius: 2px;
+
+      &.seg-1 {
+        width: 80px;
+        height: 4px;
+        top: 20px;
+        left: 60px;
+        transform: rotate(-30deg);
+        animation: lightningFlash 0.15s ease-in-out 3;
+        animation-delay: 0.3s;
+      }
+
+      &.seg-2 {
+        width: 60px;
+        height: 4px;
+        top: 80px;
+        left: 140px;
+        transform: rotate(30deg);
+        animation: lightningFlash 0.15s ease-in-out 3;
+        animation-delay: 0.5s;
+      }
+
+      &.seg-3 {
+        width: 80px;
+        height: 4px;
+        top: 140px;
+        left: 60px;
+        transform: rotate(-30deg);
+        animation: lightningFlash 0.15s ease-in-out 3;
+        animation-delay: 0.7s;
+      }
+
+      &.seg-4 {
+        width: 40px;
+        height: 4px;
+        top: 180px;
+        left: 160px;
+        transform: rotate(45deg);
+        animation: lightningFlash 0.15s ease-in-out 3;
+        animation-delay: 0.9s;
+      }
+    }
+  }
+
+  // 火花
+  .sparkles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #c9a227;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.8);
+
+      &.sp-1 {
+        top: 30%;
+        left: 20%;
+        animation: sparkleFloat 1s ease-out forwards;
+        animation-delay: 0.4s;
+      }
+      &.sp-2 {
+        top: 20%;
+        left: 50%;
+        animation: sparkleFloat 1s ease-out forwards;
+        animation-delay: 0.5s;
+      }
+      &.sp-3 {
+        top: 25%;
+        left: 80%;
+        animation: sparkleFloat 1s ease-out forwards;
+        animation-delay: 0.6s;
+      }
+      &.sp-4 {
+        top: 70%;
+        left: 15%;
+        animation: sparkleFloat 1s ease-out forwards;
+        animation-delay: 0.7s;
+      }
+      &.sp-5 {
+        top: 75%;
+        left: 50%;
+        animation: sparkleFloat 1s ease-out forwards;
+        animation-delay: 0.8s;
+      }
+      &.sp-6 {
+        top: 65%;
+        left: 85%;
+        animation: sparkleFloat 1s ease-out forwards;
+        animation-delay: 0.9s;
+      }
+    }
+  }
+
+  // 烟雾
+  .smoke-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+
+    .smoke {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle,
+        rgba(245, 230, 200, 0.4) 0%,
+        transparent 70%
+      );
+      border-radius: 50%;
+      animation: smokeRise 2s ease-out forwards;
+
+      &.smoke-1 {
+        bottom: 20%;
+        left: 30%;
+        animation-delay: 0.2s;
+      }
+      &.smoke-2 {
+        bottom: 30%;
+        left: 50%;
+        animation-delay: 0.4s;
+      }
+      &.smoke-3 {
+        bottom: 25%;
+        left: 70%;
+        animation-delay: 0.6s;
+      }
+    }
+  }
+
+  // 咒语文字
+  .spell-text {
+    position: absolute;
+    bottom: 20%;
+    animation: textAppear 0.5s ease-out forwards;
+    animation-delay: 1s;
+    opacity: 0;
+
+    .spell-word {
+      font-size: 28px;
+      font-weight: bold;
+      color: #c9a227;
+      text-shadow: 0 0 20px rgba(201, 162, 39, 0.8),
+                   0 0 40px rgba(201, 162, 39, 0.4);
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes spellFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bgGlow {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+}
+
+@keyframes wandSwipe {
+  0% { transform: rotate(-90deg); }
+  30% { transform: rotate(-60deg); }
+  50% { transform: rotate(-30deg); }
+  70% { transform: rotate(-45deg); }
+  100% { transform: rotate(-45deg); }
+}
+
+@keyframes lightningFlash {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes smokeRise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-150px) scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes textAppear {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

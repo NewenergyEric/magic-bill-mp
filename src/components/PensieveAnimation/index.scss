@@ -1,0 +1,278 @@
+// 冥想盆动画 - 记忆回溯
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.pensieve-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 1s ease;
+
+  // 深蓝色背景
+  .pensieve-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg,
+      #0a0a2e 0%,
+      #191970 30%,
+      #1a1a3e 60%,
+      #0f0f2f 100%
+    );
+  }
+
+  // 水面
+  .water-surface {
+    position: absolute;
+    top: 30%;
+    left: 0;
+    right: 0;
+    height: 50%;
+    overflow: hidden;
+
+    // 波纹
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(201, 162, 39, 0.3);
+      animation: rippleExpand 3s ease-out infinite;
+
+      &.ripple-1 {
+        width: 200px;
+        height: 100px;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-color: rgba(201, 162, 39, 0.4);
+      }
+
+      &.ripple-2 {
+        width: 300px;
+        height: 150px;
+        top: 30%;
+        left: 50%;
+        transform: translateX(-50%);
+        animation-delay: 0.5s;
+        border-color: rgba(201, 162, 39, 0.3);
+      }
+
+      &.ripple-3 {
+        width: 400px;
+        height: 200px;
+        top: 40%;
+        left: 50%;
+        transform: translateX(-50%);
+        animation-delay: 1s;
+        border-color: rgba(201, 162, 39, 0.2);
+      }
+    }
+
+    // 光斑
+    .light-spot {
+      position: absolute;
+      background: radial-gradient(circle,
+        rgba(201, 162, 39, 0.4) 0%,
+        transparent 70%
+      );
+      border-radius: 50%;
+      animation: lightFloat 4s ease-in-out infinite;
+
+      &.spot-1 {
+        width: 100px;
+        height: 100px;
+        top: 20%;
+        left: 20%;
+        animation-delay: 0s;
+      }
+
+      &.spot-2 {
+        width: 80px;
+        height: 80px;
+        top: 40%;
+        right: 25%;
+        animation-delay: 1s;
+      }
+
+      &.spot-3 {
+        width: 60px;
+        height: 60px;
+        bottom: 30%;
+        left: 40%;
+        animation-delay: 2s;
+      }
+    }
+  }
+
+  // 气泡
+  .bubbles {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+
+    .bubble {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255, 255, 255, 0.8),
+        rgba(201, 162, 39, 0.2)
+      );
+      border-radius: 50%;
+      animation: bubbleRise 4s ease-in-out infinite;
+
+      &.bubble-1 {
+        left: 20%;
+        animation-duration: 4s;
+        animation-delay: 0s;
+      }
+
+      &.bubble-2 {
+        left: 35%;
+        width: 8px;
+        height: 8px;
+        animation-duration: 3.5s;
+        animation-delay: 0.5s;
+      }
+
+      &.bubble-3 {
+        left: 50%;
+        animation-duration: 5s;
+        animation-delay: 1s;
+      }
+
+      &.bubble-4 {
+        left: 65%;
+        width: 12px;
+        height: 12px;
+        animation-duration: 4.5s;
+        animation-delay: 1.5s;
+      }
+
+      &.bubble-5 {
+        left: 80%;
+        animation-duration: 3.8s;
+        animation-delay: 2s;
+      }
+    }
+  }
+
+  // 浮现的记忆内容
+  .memory-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: memoryFloat 3s ease-in-out infinite;
+
+    .memory-scroll {
+      background: linear-gradient(145deg,
+        rgba(245, 230, 200, 0.95),
+        rgba(232, 212, 168, 0.95)
+      );
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(201, 162, 39, 0.4),
+                  0 10px 40px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(201, 162, 39, 0.6);
+
+      .memory-text {
+        font-size: 18px;
+        color: #722f37;
+        font-weight: bold;
+      }
+    }
+  }
+
+  // 冥想盆文字
+  .pensieve-text {
+    position: absolute;
+    bottom: 15%;
+    animation: textAppear 1s ease-out 0.5s forwards;
+    opacity: 0;
+
+    .pensieve-word {
+      font-size: 28px;
+      font-weight: bold;
+      color: rgba(201, 162, 39, 0.9);
+      text-shadow: 0 0 20px rgba(201, 162, 39, 0.6),
+                  0 0 40px rgba(201, 162, 39, 0.3);
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rippleExpand {
+  0% {
+    transform: translateX(-50%) scale(0.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes lightFloat {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+}
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-400px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes memoryFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) rotate(-1deg);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 10px)) rotate(1deg);
+  }
+}
+
+@keyframes textAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

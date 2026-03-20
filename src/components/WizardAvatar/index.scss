@@ -1,0 +1,62 @@
+// 巫师头像组件样式
+// 使用单独的头像图片，放大显示避免边框
+
+.wizard-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4rpx solid rgba(#d4af37, 0.3);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
+  background: #1a0f0a;
+  flex-shrink: 0;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+.wizard-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.wizard-avatar-fallback {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: rgba(#d4af37, 0.6);
+  text-transform: uppercase;
+}
+
+// 大尺寸头像
+.wizard-avatar.large {
+  width: 160rpx;
+  height: 160rpx;
+  
+  .wizard-avatar-fallback {
+    font-size: 40rpx;
+  }
+}
+
+// 小尺寸头像（用于列表项和右上角头像）
+.wizard-avatar.small {
+  width: 60rpx;
+  height: 60rpx;
+  border-width: 2rpx;
+
+  .wizard-avatar-fallback {
+    font-size: 18rpx;
+  }
+}
+
+// 超小尺寸头像（用于表格）
+.wizard-avatar.tiny {
+  width: 36rpx;
+  height: 36rpx;
+  border-width: 1rpx;
+  
+  .wizard-avatar-fallback {
+    font-size: 14rpx;
+  }
+}

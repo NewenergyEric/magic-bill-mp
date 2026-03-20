@@ -1,0 +1,150 @@
+// 均分咒页面样式
+// 使用 rpx 单位
+
+// 颜色
+$magic-gold: #d4af37;
+$magic-burgundy: #740001;
+$parchment: #f4e4bc;
+$ink: #2c1e1a;
+
+.simple-page {
+  min-height: 100vh;
+  padding: 24rpx;
+  background: #1a0f0a;
+}
+
+// 羊皮纸卡片
+.parchment-card {
+  background: $parchment;
+  border-radius: 16rpx;
+  padding: 32rpx;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.card-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.card-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $ink;
+}
+
+// 表单
+.form-section {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 22rpx;
+  color: rgba($ink, 0.6);
+  margin-bottom: 12rpx;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 2rpx solid rgba($ink, 0.2);
+  padding-bottom: 12rpx;
+}
+
+.input-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.amount-input {
+  flex: 1;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: $ink;
+}
+
+.count-row {
+  display: flex;
+  align-items: center;
+}
+
+.count-input {
+  width: 80rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $ink;
+  text-align: center;
+  border-bottom: 2rpx solid rgba($ink, 0.2);
+  padding: 8rpx 0;
+}
+
+.add-btn {
+  margin-left: 20rpx;
+  font-size: 24rpx;
+  color: $magic-burgundy;
+  background: transparent !important;
+  padding: 8rpx 16rpx !important;
+  
+  &::after {
+    border: none;
+  }
+}
+
+// 巫师网格
+.wizards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 16rpx 0;
+  min-height: 160rpx;
+}
+
+.wizard-item {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.wizard-name {
+  font-size: 18rpx;
+  font-weight: bold;
+  color: $ink;
+  margin-top: 6rpx;
+  text-align: center;
+}
+
+// 计算按钮
+.calc-button {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 20rpx 0;
+  background: $magic-burgundy !important;
+  border-radius: 8rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3) !important;
+  
+  &::after {
+    border: none;
+  }
+}
+
+.calc-icon {
+  font-size: 32rpx;
+  margin-right: 8rpx;
+}
+
+.calc-text {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}

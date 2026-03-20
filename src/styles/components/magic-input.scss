@@ -1,0 +1,152 @@
+// 魔法输入框样式
+// 获得焦点时有魔法光芒效果
+
+// 基础魔法输入框
+.magic-input {
+  background: rgba($parchment, 0.95);
+  border: 2rpx solid rgba($ink, 0.2);
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 32rpx;
+  color: $ink;
+  position: relative;
+  transition: all 0.3s ease;
+
+  // 默认占位符
+  &::placeholder {
+    color: rgba($ink, 0.4);
+  }
+
+  // 聚焦时的魔法光芒
+  &.input-focused {
+    border-color: rgba($magic-gold, 0.5);
+    box-shadow:
+      0 0 20rpx rgba($magic-gold, 0.2),
+      0 0 40rpx rgba($magic-gold, 0.1);
+    background: rgba($parchment, 1);
+
+    // 魔法光芒动画
+    &::before {
+      content: '';
+      position: absolute;
+      top: -4rpx;
+      left: -4rpx;
+      right: -4rpx;
+      bottom: -4rpx;
+      border-radius: 16rpx;
+      background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba($magic-gold, 0.3) 50%,
+        transparent 70%
+      );
+      animation: magic-shine 1.5s ease-in-out infinite;
+    }
+  }
+
+  @keyframes magic-shine {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
+
+// 金额输入框（特殊样式）
+.magic-amount-input {
+  background: linear-gradient(145deg, rgba($parchment, 0.98), rgba($parchment, 0.9));
+  border: 3rpx solid rgba($magic-gold, 0.3);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: $ink;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &.input-focused {
+    border-color: $magic-gold;
+    box-shadow:
+      0 0 30rpx rgba($magic-gold, 0.3),
+      inset 0 0 20rpx rgba($magic-gold, 0.05);
+    transform: scale(1.02);
+
+    &::after {
+      content: '💫';
+      position: absolute;
+      right: 20rpx;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 32rpx;
+      animation: sparkle 0.5s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes sparkle {
+    from {
+      opacity: 0.5;
+      transform: translateY(-50%) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+  }
+}
+
+// 魔法表单行
+.magic-form-row {
+  margin-bottom: 32rpx;
+
+  .form-label {
+    font-size: 26rpx;
+    color: rgba($ink, 0.7);
+    margin-bottom: 12rpx;
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+
+    .label-icon {
+      font-size: 24rpx;
+    }
+  }
+}
+
+// 巫师选择框
+.wizard-select-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  background: rgba($magic-burgundy, 0.1);
+  border: 2rpx solid rgba($magic-burgundy, 0.3);
+  border-radius: 50rpx;
+  font-size: 26rpx;
+  color: $ink;
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.95);
+    background: rgba($magic-burgundy, 0.15);
+  }
+
+  &.selected {
+    background: rgba($magic-burgundy, 0.2);
+    border-color: $magic-burgundy;
+    box-shadow: 0 0 12rpx rgba($magic-burgundy, 0.3);
+  }
+
+  .chip-avatar {
+    width: 36rpx;
+    height: 36rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $magic-gold, darken($magic-gold, 15%));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20rpx;
+  }
+}

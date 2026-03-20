@@ -1,0 +1,1902 @@
+// 巫师收支录页面样式
+@import "../../styles/components/result-card.scss";
+
+$magic-gold: #d4af37;
+$magic-burgundy: #740001;
+$parchment: #f4e4bc;
+$ink: #2c1e1a;
+$dark-purple: #1a0f0a;
+
+.ledger-page {
+  min-height: 100vh;
+  padding: 24rpx;
+  padding-bottom: 160rpx;
+  background: #1a0f0a;
+}
+
+// Header
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 0 24rpx;
+  position: relative;
+}
+
+.help-btn {
+  position: absolute;
+  left: 0;
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 50%;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  
+  &:active {
+    background: rgba($magic-gold, 0.2);
+  }
+}
+
+.help-icon {
+  font-size: 32rpx;
+  color: $magic-gold;
+}
+
+.header-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.header-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 开始记账按钮
+.start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx;
+  background: $magic-burgundy;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.start-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.start-text {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 区域标题
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: rgba($parchment, 0.8);
+}
+
+.add-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($magic-gold, 0.15);
+  border-radius: 50%;
+  border: 2rpx solid rgba($magic-gold, 0.4);
+  
+  &:active {
+    background: rgba($magic-gold, 0.25);
+  }
+}
+
+.add-icon {
+  font-size: 32rpx;
+  color: $magic-gold;
+}
+
+// 空状态
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  background: rgba($parchment, 0.03);
+  border-radius: 16rpx;
+  border: 2rpx dashed rgba($magic-gold, 0.2);
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: rgba($parchment, 0.6);
+  margin-bottom: 8rpx;
+}
+
+.empty-hint {
+  font-size: 26rpx;
+  color: rgba($parchment, 0.4);
+}
+
+// 事件卡片列表
+.sub-ledger-list {
+  // styles
+}
+
+// 事件卡片
+.event-card {
+  background: rgba($parchment, 0.05);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  border: 2rpx solid rgba($magic-gold, 0.15);
+  
+  &:active {
+    background: rgba($parchment, 0.08);
+  }
+}
+
+.card-header {
+  margin-bottom: 16rpx;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $parchment;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-date {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.5);
+  margin-left: 16rpx;
+}
+
+// 参与者头像行
+.card-participants {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.avatars-row {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-wrapper {
+  margin-right: -12rpx;
+  border: 3rpx solid #1a0f0a;
+  border-radius: 50%;
+  
+  .wizard-avatar {
+    width: 56rpx;
+    height: 56rpx;
+    
+    .wizard-avatar-img {
+      width: 56rpx;
+      height: 56rpx;
+    }
+  }
+}
+
+.more-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba($magic-gold, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3rpx solid #1a0f0a;
+  margin-right: -12rpx;
+}
+
+.more-text {
+  font-size: 20rpx;
+  color: $magic-gold;
+}
+
+.participant-count {
+  font-size: 26rpx;
+  color: rgba($parchment, 0.6);
+}
+
+// 卡片底部
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16rpx;
+  border-top: 2rpx solid rgba($magic-gold, 0.1);
+}
+
+.amount-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.amount-label {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.5);
+  margin-bottom: 4rpx;
+}
+
+.amount-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+.quick-settle-btn {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 20rpx;
+  background: $magic-burgundy;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.settle-icon {
+  font-size: 26rpx;
+  margin-right: 6rpx;
+}
+
+.settle-text {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 卡片操作按钮组
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.account-btn {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 20rpx;
+  background: rgba($magic-gold, 0.15);
+  border-radius: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  
+  &:active {
+    opacity: 0.9;
+    background: rgba($magic-gold, 0.25);
+  }
+}
+
+.account-icon {
+  font-size: 26rpx;
+  margin-right: 6rpx;
+}
+
+.account-text {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 详情弹窗
+.detail-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: flex-end;
+  z-index: 200;
+}
+
+.detail-content {
+  width: 100%;
+  max-height: 90vh;
+  background: #1a0f0a;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx;
+  box-sizing: border-box;
+  overflow-y: auto;
+  border-top: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.detail-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.detail-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($parchment, 0.1);
+  border-radius: 50%;
+}
+
+.close-icon {
+  font-size: 32rpx;
+  color: rgba($parchment, 0.6);
+}
+
+// 结算详情
+.settlement-detail {
+  // styles
+}
+
+// 结算总览
+.settlement-summary {
+  display: flex;
+  justify-content: space-around;
+  padding: 24rpx;
+  background: rgba($magic-burgundy, 0.2);
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.summary-item {
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.6);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.summary-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 区块标题
+.section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: rgba($parchment, 0.8);
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.section-hint {
+  font-size: 22rpx;
+  font-weight: normal;
+  color: rgba($parchment, 0.4);
+  margin-left: 8rpx;
+}
+
+// 参与者明细
+.participants-section {
+  margin-bottom: 24rpx;
+}
+
+.participants-list {
+  // styles
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: rgba($parchment, 0.03);
+  border-radius: 12rpx;
+  margin-bottom: 12rpx;
+  border-left: 6rpx solid rgba($parchment, 0.1);
+  
+  &.settled {
+    opacity: 0.7;
+    background: rgba($magic-gold, 0.05);
+  }
+  
+  &.creditor {
+    border-left-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.05);
+  }
+  
+  &.debtor {
+    border-left-color: #FF5722;
+    background: rgba(255, 87, 34, 0.05);
+  }
+  
+  &.balanced {
+    border-left-color: $magic-gold;
+  }
+}
+
+.participant-avatar {
+  margin-right: 16rpx;
+  position: relative;
+}
+
+.settled-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 32rpx;
+  height: 32rpx;
+  background: #4CAF50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  color: white;
+}
+
+.participant-info {
+  flex: 1;
+}
+
+.participant-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: $parchment;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.participant-stats {
+  display: flex;
+  gap: 16rpx;
+}
+
+.stat-item {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.5);
+}
+
+.participant-balance {
+  text-align: right;
+}
+
+.balance-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.settled-status {
+  font-size: 20rpx;
+  color: #4CAF50;
+  margin-top: 4rpx;
+  padding: 4rpx 12rpx;
+  background: rgba(76, 175, 80, 0.15);
+  border-radius: 8rpx;
+}
+
+.balance-receive {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.balance-pay {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #FF5722;
+}
+
+.balance-ok {
+  font-size: 26rpx;
+  color: $magic-gold;
+}
+
+// 结算结果 - 清晰展示支付关系
+.settlements-result-section {
+  margin-bottom: 24rpx;
+  
+  .section-hint {
+    font-size: 24rpx;
+    color: rgba($parchment, 0.5);
+    margin-bottom: 16rpx;
+    display: block;
+  }
+}
+
+.settlements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.settlement-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 16rpx;
+  background: rgba($parchment, 0.05);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba($magic-gold, 0.2);
+}
+
+.settlement-from,
+.settlement-to {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex: 1;
+  
+  .settlement-name {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: $parchment;
+    max-width: 120rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.settlement-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20rpx;
+  
+  .action-text {
+    font-size: 22rpx;
+    color: rgba($parchment, 0.5);
+  }
+  
+  .action-amount {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #E91E63;
+  }
+}
+
+// 结算结果
+.settlements-section {
+  margin-bottom: 24rpx;
+}
+
+.settlement-results-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.settlement-result-item {
+  flex: 1;
+  min-width: 45%;
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: rgba($parchment, 0.05);
+  border-radius: 12rpx;
+  border-left: 4rpx solid transparent;
+  
+  &.receiver {
+    border-left-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.08);
+  }
+  
+  &.payer {
+    border-left-color: #E91E63;
+    background: rgba(233, 30, 99, 0.08);
+  }
+  
+  &.balanced {
+    border-left-color: $magic-gold;
+    background: rgba($magic-gold, 0.08);
+  }
+}
+
+// 新的结算方案样式（以巫师为核心）
+.wizard-settlements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.wizard-settlement-card {
+  background: rgba($parchment, 0.05);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  border-left: 4rpx solid transparent;
+  
+  &.receiver {
+    border-left-color: #4CAF50;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba($parchment, 0.03) 100%);
+  }
+  
+  &.payer {
+    border-left-color: #E91E63;
+    background: linear-gradient(135deg, rgba(233, 30, 99, 0.08) 0%, rgba($parchment, 0.03) 100%);
+  }
+  
+  .wizard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12rpx;
+    
+    .wizard-info {
+      display: flex;
+      align-items: center;
+      gap: 12rpx;
+      
+      .wizard-name {
+        font-size: 30rpx;
+        font-weight: bold;
+        color: $parchment;
+      }
+      
+      .settled-badge {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        font-size: 20rpx;
+        padding: 2rpx 12rpx;
+        border-radius: 8rpx;
+      }
+    }
+    
+    .balance-tag {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      padding: 8rpx 16rpx;
+      border-radius: 8rpx;
+      
+      &.receive {
+        background: rgba(76, 175, 80, 0.15);
+        
+        .balance-label {
+          color: #4CAF50;
+        }
+        
+        .balance-amount {
+          color: #4CAF50;
+        }
+      }
+      
+      &.pay {
+        background: rgba(233, 30, 99, 0.15);
+        
+        .balance-label {
+          color: #E91E63;
+        }
+        
+        .balance-amount {
+          color: #E91E63;
+        }
+      }
+      
+      .balance-label {
+        font-size: 20rpx;
+      }
+      
+      .balance-amount {
+        font-size: 28rpx;
+        font-weight: bold;
+      }
+    }
+  }
+  
+  // 金额明细：垫付和消费
+  .amount-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16rpx;
+    background: rgba($dark-purple, 0.3);
+    border-radius: 12rpx;
+    margin-bottom: 12rpx;
+    
+    .amount-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      
+      .amount-label {
+        font-size: 22rpx;
+        color: rgba($parchment, 0.6);
+        margin-bottom: 4rpx;
+      }
+      
+      .amount-value {
+        font-size: 28rpx;
+        font-weight: bold;
+        
+        &.paid {
+          color: $magic-gold;
+        }
+        
+        &.consumed {
+          color: rgba($parchment, 0.9);
+        }
+      }
+    }
+    
+    .amount-divider {
+      width: 2rpx;
+      height: 40rpx;
+      background: rgba($parchment, 0.2);
+      margin: 0 24rpx;
+    }
+  }
+  
+  .settlement-details {
+    margin-top: 8rpx;
+    
+    .detail-label {
+      font-size: 22rpx;
+      color: rgba($parchment, 0.5);
+      margin-bottom: 6rpx;
+      display: block;
+    }
+    
+    .detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8rpx 12rpx;
+      background: rgba($dark-purple, 0.2);
+      border-radius: 8rpx;
+      margin-bottom: 6rpx;
+      
+      .target-wizard {
+        display: flex;
+        align-items: center;
+        gap: 8rpx;
+        
+        .target-name {
+          font-size: 26rpx;
+          color: $parchment;
+        }
+      }
+      
+      .detail-amount {
+        font-size: 26rpx;
+        font-weight: bold;
+        color: $magic-gold;
+      }
+    }
+  }
+  
+  .settle-status-hint {
+    margin-top: 12rpx;
+    text-align: center;
+    
+    .hint-text {
+      font-size: 22rpx;
+      color: rgba($parchment, 0.4);
+    }
+  }
+}
+
+.sr-avatar {
+  margin-right: 12rpx;
+}
+
+.sr-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: $parchment;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sr-amount-wrapper {
+  flex-shrink: 0;
+}
+
+.sr-amount {
+  font-size: 26rpx;
+  font-weight: bold;
+  
+  &.balanced {
+    color: $magic-gold;
+  }
+  
+  &.receive {
+    color: #4CAF50;
+  }
+  
+  &.pay {
+    color: #E91E63;
+  }
+}
+
+// 账单记录
+.bills-section {
+  margin-bottom: 24rpx;
+}
+
+.bills-scroll {
+  max-height: 400rpx;
+  min-height: 100rpx;
+}
+
+// 新的账单卡片样式（施咒后风格）
+.bill-card-item {
+  background: linear-gradient(145deg, rgba($parchment, 0.08) 0%, rgba($dark-purple, 0.15) 100%);
+  border: 2rpx solid rgba($magic-gold, 0.25);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  
+  .bill-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12rpx;
+    
+    .bill-type-icon {
+      font-size: 32rpx;
+      margin-right: 12rpx;
+    }
+    
+    .bill-event-name {
+      flex: 1;
+      font-size: 30rpx;
+      font-weight: bold;
+      color: $parchment;
+    }
+    
+    .bill-date-tag {
+      font-size: 22rpx;
+      color: rgba($parchment, 0.5);
+      background: rgba($magic-gold, 0.15);
+      padding: 4rpx 12rpx;
+      border-radius: 8rpx;
+    }
+  }
+  
+  .bill-card-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 16rpx;
+    margin-bottom: 12rpx;
+    
+    .bill-total {
+      font-size: 36rpx;
+      font-weight: bold;
+      color: $magic-gold;
+    }
+    
+    .bill-per-person {
+      font-size: 24rpx;
+      color: rgba($parchment, 0.6);
+    }
+  }
+  
+  .bill-settlement {
+    background: rgba($dark-purple, 0.3);
+    border-radius: 12rpx;
+    padding: 12rpx;
+    margin-bottom: 12rpx;
+    
+    .settlement-label {
+      font-size: 22rpx;
+      color: $magic-gold;
+      margin-bottom: 8rpx;
+      display: block;
+    }
+    
+    .settlement-hint {
+      .mini-settlement-row {
+        display: flex;
+        align-items: center;
+        padding: 6rpx 0;
+        
+        .mini-from {
+          font-size: 24rpx;
+          color: $parchment;
+          min-width: 80rpx;
+        }
+        
+        .mini-arrow {
+          flex: 1;
+          font-size: 22rpx;
+          color: rgba($parchment, 0.6);
+          text-align: center;
+        }
+        
+        .mini-to {
+          font-size: 24rpx;
+          color: $magic-gold;
+          font-weight: bold;
+          min-width: 80rpx;
+        }
+      }
+      
+      .more-settlements {
+        font-size: 22rpx;
+        color: rgba($parchment, 0.5);
+        text-align: center;
+        padding: 8rpx 0;
+      }
+    }
+  }
+  
+  .bill-card-wizards {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    margin-bottom: 8rpx;
+    
+    .mini-wizard {
+      width: 44rpx;
+      height: 44rpx;
+    }
+    
+    .more-wizards {
+      font-size: 22rpx;
+      color: rgba($parchment, 0.5);
+      margin-left: 8rpx;
+    }
+  }
+  
+  .bill-click-hint {
+    font-size: 22rpx;
+    color: rgba($parchment, 0.4);
+    text-align: right;
+    display: block;
+  }
+}
+
+.bill-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: rgba($parchment, 0.03);
+  border-radius: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.bill-item-hover {
+  background: rgba($parchment, 0.08);
+  transform: scale(0.98);
+}
+
+.bill-type {
+  margin-right: 12rpx;
+}
+
+.type-icon {
+  font-size: 28rpx;
+}
+
+.bill-info {
+  flex: 1;
+}
+
+.bill-event {
+  font-size: 28rpx;
+  color: $parchment;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.bill-meta {
+  font-size: 22rpx;
+  color: rgba($parchment, 0.5);
+}
+
+.bill-amount {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 操作按钮 - 魔法羊皮纸风格
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid rgba($magic-gold, 0.15);
+}
+
+// 主操作按钮行
+.detail-actions-primary {
+  display: flex;
+  gap: 16rpx;
+  
+  .action-btn {
+    flex: 1;
+    min-height: 88rpx;
+  }
+}
+
+// 次操作按钮行
+.detail-actions-secondary {
+  display: flex;
+  gap: 12rpx;
+  
+  .action-btn {
+    flex: 1;
+    min-height: 72rpx;
+    opacity: 0.8;
+    
+    &:active {
+      opacity: 1;
+    }
+  }
+}
+
+.action-btn {
+  flex: 1;
+  padding: 20rpx 16rpx;
+  min-height: 80rpx;
+  min-width: 80rpx;
+  border-radius: 12rpx;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  
+  // 羊皮纸卷边效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4rpx;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba($magic-gold, 0.3) 20%, 
+      rgba($magic-gold, 0.5) 50%, 
+      rgba($magic-gold, 0.3) 80%, 
+      transparent 100%
+    );
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3rpx;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(0, 0, 0, 0.2) 30%, 
+      rgba(0, 0, 0, 0.3) 50%, 
+      rgba(0, 0, 0, 0.2) 70%, 
+      transparent 100%
+    );
+  }
+  
+  // 统一使用魔法金色主题
+  &.primary {
+    background: linear-gradient(180deg, 
+      rgba($magic-burgundy, 0.9) 0%, 
+      rgba($magic-burgundy, 0.7) 100%
+    );
+    border: 2rpx solid rgba($magic-gold, 0.4);
+    box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.3);
+    
+    .btn-text {
+      color: $magic-gold;
+      text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  &.secondary {
+    background: linear-gradient(180deg, 
+      rgba($magic-gold, 0.12) 0%, 
+      rgba($magic-gold, 0.06) 100%
+    );
+    border: 2rpx solid rgba($magic-gold, 0.35);
+    box-shadow: 0 4rpx 12rpx rgba($magic-gold, 0.1);
+    
+    .btn-text {
+      color: rgba($parchment, 0.9);
+    }
+  }
+  
+  &.archive {
+    background: linear-gradient(180deg, 
+      rgba($magic-gold, 0.15) 0%, 
+      rgba($magic-gold, 0.08) 100%
+    );
+    border: 2rpx solid rgba($magic-gold, 0.35);
+    box-shadow: 0 4rpx 12rpx rgba($magic-gold, 0.1);
+    
+    .btn-text {
+      color: rgba($parchment, 0.85);
+    }
+  }
+  
+  &.share {
+    background: linear-gradient(180deg, 
+      rgba($magic-gold, 0.18) 0%, 
+      rgba($magic-gold, 0.1) 100%
+    );
+    border: 2rpx solid rgba($magic-gold, 0.4);
+    box-shadow: 0 4rpx 12rpx rgba($magic-gold, 0.15);
+    
+    .btn-text {
+      color: $magic-gold;
+    }
+  }
+  
+  &.danger {
+    background: linear-gradient(180deg, 
+      rgba($magic-burgundy, 0.4) 0%, 
+      rgba($magic-burgundy, 0.25) 100%
+    );
+    border: 2rpx solid rgba($magic-burgundy, 0.5);
+    box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.2);
+    
+    .btn-text {
+      color: rgba($parchment, 0.85);
+    }
+  }
+  
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+.btn-text {
+  font-size: 26rpx;
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+// 弹窗
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: calc(100vw - 80rpx);
+  background: rgba(26, 15, 10, 0.98);
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-sizing: border-box;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-input {
+  width: 100%;
+  font-size: 32rpx;
+  padding: 28rpx 24rpx;
+  min-height: 96rpx;
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 12rpx;
+  color: $ink;
+  box-sizing: border-box;
+  margin-bottom: 32rpx;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  gap: 24rpx;
+}
+
+.modal-cancel {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx;
+  font-size: 30rpx;
+  color: rgba($parchment, 0.6);
+  background: rgba($parchment, 0.1);
+  border-radius: 12rpx;
+}
+
+.modal-confirm {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  background: $magic-burgundy;
+  border-radius: 12rpx;
+}
+
+// 可点击元素
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:active {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+// 账单项箭头
+.bill-arrow {
+  font-size: 32rpx;
+  color: rgba($parchment, 0.3);
+  margin-left: 8rpx;
+}
+
+// 结算结果 - 按收款人分组
+.settlements-result-section {
+  margin-bottom: 24rpx;
+}
+
+.settlements-by-receiver {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.receiver-card {
+  background: rgba($parchment, 0.05);
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.receiver-header {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: rgba(#4CAF50, 0.1);
+  border-bottom: 1rpx solid rgba($parchment, 0.1);
+
+  .receiver-name {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #4CAF50;
+    margin-left: 12rpx;
+  }
+}
+
+.payments-list {
+  padding: 12rpx 16rpx;
+}
+
+.payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10rpx 0;
+  border-bottom: 1rpx solid rgba($parchment, 0.05);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.payment-from {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+
+  .from-name {
+    font-size: 26rpx;
+    color: $parchment;
+  }
+}
+
+.payment-amount {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #E91E63;
+}
+
+// 计算过程 - 表格形式
+.calc-process-section {
+  margin-bottom: 24rpx;
+  background: rgba($parchment, 0.03);
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 16rpx;
+}
+
+.section-header.clickable {
+  cursor: pointer;
+}
+
+.toggle-icon {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.5);
+}
+
+.calc-process-content {
+  padding: 0 16rpx 16rpx;
+  border-top: 2rpx solid rgba($magic-gold, 0.1);
+  padding-top: 16rpx;
+}
+
+// 计算表格
+.calc-table-header {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 8rpx;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 8rpx 8rpx 0 0;
+  
+  .th-avatar {
+    width: 60rpx;
+  }
+  
+  .th-name {
+    flex: 1;
+    min-width: 80rpx;
+    font-size: 24rpx;
+    color: rgba($parchment, 0.8);
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .th-paid,
+  .th-consumed {
+    width: 130rpx;
+    font-size: 22rpx;
+    color: rgba($parchment, 0.7);
+    text-align: right;
+    padding-right: 8rpx;
+  }
+  
+  .th-balance {
+    width: 140rpx;
+    font-size: 22rpx;
+    color: rgba($parchment, 0.7);
+    text-align: right;
+    padding-right: 8rpx;
+  }
+}
+
+.calc-table-body .calc-table-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 8rpx;
+  border-bottom: 1rpx solid rgba($parchment, 0.05);
+}
+
+.calc-table-body .calc-table-row:last-child {
+  border-bottom: none;
+}
+
+.calc-table-body .calc-table-row.row-receive {
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.calc-table-body .calc-table-row.row-pay {
+  background: rgba(233, 30, 99, 0.05);
+}
+
+.calc-table-body .calc-table-row.row-settled {
+  opacity: 0.6;
+  background: rgba($parchment, 0.02);
+}
+
+.calc-table-body .calc-table-row .td-avatar {
+  width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-table-body .calc-table-row .td-name {
+  flex: 1;
+  min-width: 80rpx;
+  font-size: 26rpx;
+  color: $parchment;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calc-table-body .calc-table-row .td-paid,
+.calc-table-body .calc-table-row .td-consumed {
+  width: 130rpx;
+  font-size: 24rpx;
+  color: rgba($parchment, 0.8);
+  text-align: right;
+  font-family: monospace;
+  padding-right: 8rpx;
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper {
+  width: 140rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6rpx;
+  padding-right: 8rpx;
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .balance-label-text {
+  font-size: 20rpx;
+  padding: 2rpx 6rpx;
+  border-radius: 4rpx;
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .balance-label-text.receive {
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.15);
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .balance-label-text.pay {
+  color: #E91E63;
+  background: rgba(233, 30, 99, 0.15);
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .td-balance {
+  font-size: 24rpx;
+  text-align: right;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .td-balance.positive {
+  color: #4CAF50;
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .td-balance.negative {
+  color: #E91E63;
+}
+
+.calc-table-body .calc-table-row .td-balance-wrapper .td-balance.zero {
+  color: rgba($parchment, 0.5);
+}
+
+// 总览
+.calc-overview {
+  display: flex;
+  gap: 24rpx;
+  padding: 16rpx;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.overview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  
+  .overview-label {
+    font-size: 24rpx;
+    color: rgba($parchment, 0.6);
+    margin-bottom: 8rpx;
+  }
+  
+  .overview-value {
+    font-size: 36rpx;
+    font-weight: bold;
+    color: $magic-gold;
+  }
+}
+
+// 计算详情卡片
+.calc-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.calc-person-card {
+  flex: 1;
+  min-width: 45%;
+  background: rgba($parchment, 0.05);
+  border-radius: 12rpx;
+  padding: 16rpx;
+}
+
+.calc-person-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid rgba($parchment, 0.1);
+}
+
+.calc-person-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: $parchment;
+  margin-left: 10rpx;
+}
+
+.calc-person-amounts {
+  .amount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8rpx 0;
+    
+    &.result {
+      padding-top: 12rpx;
+    }
+    
+    .amount-label {
+      font-size: 24rpx;
+      color: rgba($parchment, 0.5);
+    }
+    
+    .amount-value {
+      font-size: 28rpx;
+      font-weight: bold;
+      
+      &.paid {
+        color: #2196F3;
+      }
+      
+      &.consumed {
+        color: #FF9800;
+      }
+      
+      &.receive {
+        color: #4CAF50;
+      }
+      
+      &.pay {
+        color: #E91E63;
+      }
+    }
+  }
+  
+  .amount-divider {
+    height: 1rpx;
+    background: rgba($parchment, 0.1);
+    margin: 8rpx 0;
+  }
+}
+
+// 旧样式保留
+.settlements-section {
+  margin-bottom: 24rpx;
+}
+
+.settlement-results-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.settlement-result-item {
+  flex: 1;
+  min-width: 45%;
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: rgba($parchment, 0.05);
+  border-radius: 12rpx;
+  border-left: 4rpx solid transparent;
+  
+  &.receiver {
+    border-left-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.08);
+  }
+  
+  &.payer {
+    border-left-color: #E91E63;
+    background: rgba(233, 30, 99, 0.08);
+  }
+  
+  &.balanced {
+    border-left-color: $magic-gold;
+    background: rgba($magic-gold, 0.08);
+  }
+}
+
+.sr-avatar {
+  margin-right: 12rpx;
+}
+
+.sr-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: $parchment;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sr-amount-wrapper {
+  flex-shrink: 0;
+}
+
+.sr-amount {
+  font-size: 26rpx;
+  font-weight: bold;
+  
+  &.balanced {
+    color: $magic-gold;
+  }
+  
+  &.receive {
+    color: #4CAF50;
+  }
+  
+  &.pay {
+    color: #E91E63;
+  }
+}
+
+.cp-paid {
+  font-size: 22rpx;
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 4rpx 10rpx;
+  border-radius: 6rpx;
+}
+
+.cp-should {
+  font-size: 22rpx;
+  color: rgba($parchment, 0.6);
+}
+
+.calc-bill-shares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.share-item {
+  display: flex;
+  align-items: center;
+  padding: 6rpx 12rpx;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 16rpx;
+}
+
+.share-name {
+  font-size: 22rpx;
+  color: rgba($parchment, 0.7);
+  margin-right: 8rpx;
+}
+
+.share-amount {
+  font-size: 22rpx;
+  color: $magic-gold;
+}
+
+.more-shares {
+  font-size: 22rpx;
+  color: rgba($parchment, 0.4);
+  padding: 6rpx 12rpx;
+}
+
+// 账单详情弹窗（与施咒后结果卡片一致）
+
+.detail-type {
+  font-size: 28rpx;
+  color: rgba($parchment, 0.6);
+}
+
+.detail-event-name {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  margin: 12rpx 0 8rpx;
+}
+
+.detail-date {
+  display: block;
+  font-size: 24rpx;
+  color: rgba($parchment, 0.4);
+  margin-bottom: 24rpx;
+}
+
+.detail-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx;
+  background: rgba($magic-burgundy, 0.15);
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.stat-row {
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 22rpx;
+  color: rgba($parchment, 0.5);
+  margin-bottom: 6rpx;
+}
+
+.stat-value {
+  font-size: 28rpx;
+  color: $parchment;
+  
+  &.large {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $magic-gold;
+  }
+}
+
+.detail-section-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: rgba($parchment, 0.8);
+  margin-bottom: 16rpx;
+}
+
+.detail-participants {
+  margin-bottom: 24rpx;
+}
+
+.detail-participant-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx;
+  background: rgba($parchment, 0.03);
+  border-radius: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.dp-avatar {
+  margin-right: 12rpx;
+  
+  .wizard-avatar {
+    width: 48rpx;
+    height: 48rpx;
+  }
+}
+
+.dp-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: $parchment;
+}
+
+.dp-amounts {
+  text-align: right;
+}
+
+.dp-paid {
+  display: block;
+  font-size: 22rpx;
+  color: #4CAF50;
+}
+
+.dp-should {
+  display: block;
+  font-size: 24rpx;
+  color: rgba($parchment, 0.6);
+}
+
+.detail-settlements {
+  margin-bottom: 24rpx;
+}
+
+.detail-settlement-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx;
+  background: rgba($magic-gold, 0.05);
+  border-radius: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.ds-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100rpx;
+  
+  .wizard-avatar {
+    width: 48rpx;
+    height: 48rpx;
+  }
+}
+
+.ds-name {
+  font-size: 22rpx;
+  color: $parchment;
+  margin-top: 4rpx;
+}
+
+.ds-arrow {
+  font-size: 24rpx;
+  color: $magic-gold;
+}
+
+.detail-footer {
+  padding: 16rpx 24rpx;
+  border-top: 2rpx solid rgba($magic-gold, 0.15);
+}
+
+.detail-back-btn {
+  padding: 20rpx;
+  background: rgba($magic-gold, 0.15);
+  border-radius: 12rpx;
+  text-align: center;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.back-text {
+  font-size: 28rpx;
+  color: $magic-gold;
+}

@@ -1,0 +1,264 @@
+.login-modal-content {
+  background: linear-gradient(135deg, #2a1810 0%, #1a0f0a 100%);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  padding-top: 60rpx;
+  position: relative;
+  width: 90%;
+  max-width: 600rpx;
+  max-height: 80vh;
+  margin: 0 auto;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  .modal-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 32rpx;
+
+    .modal-title {
+      font-size: 34rpx;
+      font-weight: bold;
+      color: #f5e6d3;
+      text-align: center;
+    }
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 20rpx;
+    right: 20rpx;
+    width: 56rpx;
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(168, 144, 128, 0.8);
+    font-size: 36rpx;
+    z-index: 10;
+    background: rgba(168, 144, 128, 0.15);
+    border-radius: 50%;
+
+    &:active {
+      opacity: 0.6;
+      background: rgba(168, 144, 128, 0.25);
+    }
+  }
+
+  .form-section {
+    width: 100%;
+    box-sizing: border-box;
+    
+    .form-label {
+      font-size: 28rpx;
+      color: #c4a882;
+      margin-bottom: 16rpx;
+      margin-top: 24rpx;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .avatar-picker {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16rpx;
+
+      .avatar-btn {
+        width: 120rpx;
+        height: 120rpx;
+        border-radius: 50%;
+        border: 4rpx dashed #8b6914;
+        background: rgba(139, 105, 20, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 0;
+
+        &::after {
+          border: none;
+        }
+
+        .preview-avatar {
+          width: 100%;
+          height: 100%;
+        }
+
+        .avatar-placeholder-text {
+          font-size: 22rpx;
+          color: #8b6914;
+        }
+      }
+    }
+
+    .wizards-select {
+      margin-top: 24rpx;
+      padding-top: 24rpx;
+      border-top: 1rpx solid rgba(196, 168, 130, 0.2);
+
+      .select-label {
+        font-size: 24rpx;
+        color: #a89080;
+        margin-bottom: 16rpx;
+      }
+
+      .wizards-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12rpx;
+        max-height: 300rpx;
+        overflow-y: auto;
+
+        .wizard-option {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 8rpx 12rpx;
+          border-radius: 12rpx;
+          border: 2rpx solid transparent;
+          background: rgba(196, 168, 130, 0.1);
+
+          &.selected {
+            border-color: #8b6914;
+            background: rgba(139, 105, 20, 0.3);
+          }
+
+          &:active {
+            opacity: 0.8;
+          }
+
+          .wizard-name {
+            font-size: 20rpx;
+            color: #c4a882;
+            margin-top: 4rpx;
+            max-width: 80rpx;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+
+    .nickname-input {
+      width: 100%;
+      height: 80rpx;
+      background: rgba(196, 168, 130, 0.1);
+      border-radius: 12rpx;
+      padding: 0 24rpx;
+      font-size: 28rpx;
+      color: #f5e6d3;
+      border: 2rpx solid rgba(196, 168, 130, 0.3);
+      box-sizing: border-box;
+
+      &::placeholder {
+        color: #8b7355;
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 24rpx;
+    margin-top: 40rpx;
+
+    button {
+      flex: 1;
+      height: 80rpx;
+      border-radius: 12rpx;
+      font-size: 28rpx;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &::after {
+        border: none;
+      }
+    }
+
+    .cancel-btn {
+      background: rgba(196, 168, 130, 0.2);
+      color: #c4a882;
+    }
+
+    .confirm-btn {
+      background: linear-gradient(135deg, #8b6914 0%, #6b4f0f 100%);
+      color: #f5e6d3;
+    }
+  }
+
+  // 已登录状态样式
+  &.logged-in {
+    .user-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40rpx 0;
+
+      .user-avatar-large {
+        width: 160rpx;
+        height: 160rpx;
+        border-radius: 50%;
+        border: 4rpx solid #8b6914;
+        overflow: hidden;
+        background: rgba(139, 105, 20, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .avatar-img {
+          width: 100%;
+          height: 100%;
+        }
+
+        .avatar-placeholder {
+          font-size: 64rpx;
+        }
+      }
+
+      .user-name {
+        font-size: 36rpx;
+        font-weight: bold;
+        color: #f5e6d3;
+        margin-top: 20rpx;
+      }
+
+      .companion-hint {
+        font-size: 24rpx;
+        color: #8b6914;
+        margin-top: 8rpx;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 24rpx;
+      margin-top: 20rpx;
+
+      button {
+        flex: 1;
+        height: 72rpx;
+        border-radius: 12rpx;
+        font-size: 26rpx;
+
+        &::after {
+          border: none;
+        }
+      }
+
+      .edit-btn {
+        background: linear-gradient(135deg, #8b6914 0%, #6b4f0f 100%);
+        color: #f5e6d3;
+      }
+
+      .logout-btn {
+        background: rgba(196, 168, 130, 0.2);
+        color: #c4a882;
+      }
+    }
+  }
+}

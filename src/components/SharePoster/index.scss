@@ -1,0 +1,205 @@
+.share-poster-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.share-poster-content {
+  width: 100%;
+  max-width: 420px;
+  background: #1a0f0a;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  box-sizing: border-box;
+  border: 2rpx solid rgba(212, 175, 55, 0.3);
+}
+
+.share-poster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.share-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.share-close {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 228, 188, 0.1);
+  border-radius: 50%;
+}
+
+.close-icon {
+  font-size: 32rpx;
+  color: rgba(244, 228, 188, 0.6);
+}
+
+// 预览卡片
+.share-preview {
+  background: linear-gradient(180deg, #2d1f1a 0%, #1a0f0a 100%);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(212, 175, 55, 0.3);
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.preview-header {
+  text-align: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid rgba(212, 175, 55, 0.2);
+}
+
+.preview-brand {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.preview-event {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #f4e4bc;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.preview-amount {
+  text-align: center;
+  padding: 24rpx;
+  background: rgba(116, 0, 1, 0.3);
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.amount-label {
+  font-size: 24rpx;
+  color: rgba(244, 228, 188, 0.6);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.amount-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.preview-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.info-text {
+  font-size: 26rpx;
+  color: rgba(244, 228, 188, 0.7);
+}
+
+.info-type {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.preview-wizards {
+  padding: 16rpx;
+  background: rgba(44, 30, 26, 0.5);
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.wizards-label {
+  font-size: 24rpx;
+  color: rgba(244, 228, 188, 0.5);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.wizards-names {
+  font-size: 26rpx;
+  color: #f4e4bc;
+}
+
+.preview-quote {
+  padding: 16rpx;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 12rpx;
+  border-left: 4rpx solid rgba(212, 175, 55, 0.5);
+  margin-bottom: 20rpx;
+}
+
+.quote-text {
+  font-size: 22rpx;
+  color: rgba(244, 228, 188, 0.7);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.preview-footer {
+  text-align: center;
+  padding-top: 16rpx;
+  border-top: 2rpx solid rgba(212, 175, 55, 0.2);
+}
+
+.footer-text {
+  font-size: 22rpx;
+  color: rgba(244, 228, 188, 0.4);
+}
+
+.share-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.share-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  border: none;
+  
+  &::after {
+    border: none;
+  }
+}
+
+.save-btn {
+  background: rgba(212, 175, 55, 0.2);
+  border: 2rpx solid rgba(212, 175, 55, 0.4) !important;
+}
+
+.friend-btn {
+  background: #740001;
+  border: 2rpx solid rgba(212, 175, 55, 0.3) !important;
+}
+
+.btn-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.btn-text {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #d4af37;
+}

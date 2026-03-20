@@ -1,0 +1,813 @@
+// 契约页面样式 - 与其他页面保持一致
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.contract-page {
+  min-height: 100vh;
+  padding: 24rpx;
+  padding-bottom: 140rpx;
+  background: #1a0f0a;
+}
+
+// Header
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 0;
+  margin-bottom: 24rpx;
+  position: relative;
+}
+
+.header-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.header-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 返回按钮
+.back-btn {
+  position: absolute;
+  left: 0;
+  padding: 10rpx 20rpx;
+  z-index: 10;
+
+  .back-text {
+    font-size: 32rpx;
+    color: $magic-gold;
+  }
+}
+
+// 提示卡片
+.tips-card {
+  background: rgba($magic-gold, 0.1);
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.2);
+
+  .tips-text {
+    font-size: 28rpx;
+    color: rgba($parchment, 0.8);
+  }
+}
+
+// 登录卡片
+.login-card {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background: rgba($parchment, 0.1);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  margin-bottom: 24rpx;
+
+  .login-icon {
+    font-size: 48rpx;
+    margin-right: 20rpx;
+  }
+
+  .login-info {
+    flex: 1;
+
+    .login-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: $parchment;
+      display: block;
+      margin-bottom: 8rpx;
+    }
+
+    .login-hint {
+      font-size: 24rpx;
+      color: rgba($parchment, 0.6);
+    }
+  }
+
+  .login-arrow {
+    font-size: 48rpx;
+    color: $magic-gold;
+  }
+
+  &:active {
+    opacity: 0.8;
+    background: rgba($parchment, 0.15);
+  }
+}
+
+// 操作按钮行
+.action-row {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30rpx 20rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid;
+
+  .action-icon {
+    font-size: 48rpx;
+    margin-bottom: 12rpx;
+  }
+
+  .action-text {
+    font-size: 28rpx;
+    font-weight: bold;
+  }
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.create-btn {
+  background: rgba($magic-gold, 0.15);
+  border-color: $magic-gold;
+
+  .action-text {
+    color: $magic-gold;
+  }
+}
+
+.join-btn {
+  background: rgba(#4a90a4, 0.15);
+  border-color: #4a90a4;
+
+  .action-text {
+    color: #4a90a4;
+  }
+}
+
+// 用户信息栏
+.user-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16rpx 0;
+  margin-bottom: 16rpx;
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    padding: 8rpx 20rpx 8rpx 8rpx;
+    background: rgba($parchment, 0.1);
+    border-radius: 30rpx;
+
+    .user-name {
+      font-size: 28rpx;
+      color: $parchment;
+    }
+  }
+}
+
+// 区块标题 - 与 ledger 页面保持一致
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: rgba($parchment, 0.8);
+  margin-bottom: 16rpx;
+}
+
+// 加载状态
+.loading-state {
+  text-align: center;
+  padding: 60rpx;
+
+  .loading-text {
+    font-size: 28rpx;
+    color: rgba($parchment, 0.6);
+  }
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  background: rgba($parchment, 0.05);
+  border-radius: 16rpx;
+  border: 2rpx dashed rgba($magic-gold, 0.3);
+
+  .empty-icon {
+    font-size: 80rpx;
+    display: block;
+    margin-bottom: 20rpx;
+  }
+
+  .empty-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $parchment;
+    display: block;
+    margin-bottom: 12rpx;
+  }
+
+  .empty-hint {
+    font-size: 26rpx;
+    color: rgba($parchment, 0.5);
+  }
+}
+
+// 契约列表
+.contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.contract-item {
+  padding: 24rpx;
+  background: rgba($parchment, 0.08);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba($magic-gold, 0.2);
+
+  &:active {
+    background: rgba($parchment, 0.12);
+  }
+}
+
+.contract-main {
+  margin-bottom: 16rpx;
+}
+
+.contract-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+
+  .contract-name {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $parchment;
+  }
+
+  .contract-date {
+    font-size: 24rpx;
+    color: rgba($parchment, 0.5);
+  }
+}
+
+.contract-meta {
+  display: flex;
+  gap: 20rpx;
+
+  .meta-tag {
+    font-size: 26rpx;
+    color: $magic-gold;
+  }
+}
+
+.contract-actions {
+  border-top: 1rpx solid rgba($magic-gold, 0.15);
+  padding-top: 16rpx;
+}
+
+.copy-code-btn {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  background: rgba($magic-gold, 0.15);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba($magic-gold, 0.4);
+
+  .copy-code-text {
+    font-size: 24rpx;
+    color: $magic-gold;
+  }
+
+  &:active {
+    background: rgba($magic-gold, 0.25);
+  }
+}
+
+// 表单卡片
+.form-card {
+  padding: 30rpx;
+  background: rgba($parchment, 0.1);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba($magic-gold, 0.2);
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: $parchment;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12rpx;
+  border: 2rpx solid rgba($magic-gold, 0.4);
+  font-size: 32rpx;
+  color: $ink;
+
+  &.code-input {
+    text-align: center;
+    letter-spacing: 8rpx;
+    font-size: 40rpx;
+    font-weight: bold;
+  }
+}
+
+.form-placeholder {
+  color: rgba($ink, 0.4);
+}
+
+.form-hint-card {
+  padding: 16rpx 20rpx;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 8rpx;
+  border-left: 4rpx solid $magic-gold;
+  margin-bottom: 30rpx;
+
+  .form-hint-text {
+    font-size: 26rpx;
+    color: rgba($parchment, 0.7);
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 24rpx;
+  background: transparent;
+  border: 2rpx solid rgba($parchment, 0.3);
+  border-radius: 12rpx;
+  text-align: center;
+
+  .cancel-btn-text {
+    font-size: 30rpx;
+    color: rgba($parchment, 0.6);
+  }
+
+  &:active {
+    background: rgba($parchment, 0.1);
+  }
+}
+
+.confirm-btn {
+  flex: 2;
+  padding: 24rpx;
+  background: linear-gradient(145deg, $magic-burgundy, darken($magic-burgundy, 10%));
+  border-radius: 12rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 15rpx rgba($magic-burgundy, 0.4);
+
+  .confirm-btn-text {
+    font-size: 30rpx;
+    font-weight: bold;
+    color: $parchment;
+  }
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  &.loading {
+    opacity: 0.7;
+  }
+}
+
+// 登录弹窗
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.login-modal-content {
+  width: 90%;
+  max-width: 600rpx;
+}
+
+// 签署动画
+.signing-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+// 契约详情卡片
+.contract-detail-card {
+  background: rgba($parchment, 0.95);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.detail-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid rgba($ink, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.detail-label {
+  font-size: 28rpx;
+  color: rgba($ink, 0.6);
+}
+
+.detail-value {
+  font-size: 28rpx;
+  color: $ink;
+}
+
+.detail-value-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.detail-code {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+  letter-spacing: 4rpx;
+}
+
+.copy-btn {
+  background: $magic-gold;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+
+  .copy-btn-text {
+    font-size: 24rpx;
+    color: #1a0f0a;
+    font-weight: bold;
+  }
+}
+
+// 成员列表
+.member-list {
+  background: rgba($parchment, 0.95);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba($ink, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.member-avatar {
+  margin-right: 16rpx;
+}
+
+.member-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-size: 30rpx;
+  color: $ink;
+  font-weight: bold;
+}
+
+.member-role {
+  font-size: 24rpx;
+  color: rgba($ink, 0.6);
+  margin-top: 4rpx;
+}
+
+.remove-btn {
+  background: rgba($magic-burgundy, 0.2);
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid $magic-burgundy;
+
+  .remove-btn-text {
+    font-size: 24rpx;
+    color: $magic-burgundy;
+  }
+}
+
+// 账单区域
+.bill-section {
+  background: rgba($parchment, 0.95);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.bill-list {
+  background: rgba($parchment, 0.95);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.bill-empty {
+  text-align: center;
+  padding: 40rpx 0;
+
+  .bill-empty-text {
+    font-size: 28rpx;
+    color: rgba($ink, 0.6);
+    display: block;
+  }
+
+  .bill-empty-hint {
+    font-size: 24rpx;
+    color: rgba($ink, 0.4);
+    margin-top: 8rpx;
+    display: block;
+  }
+}
+
+.bill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid rgba($ink, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.bill-info {
+  flex: 1;
+}
+
+.bill-name {
+  font-size: 28rpx;
+  color: $ink;
+  font-weight: bold;
+}
+
+.bill-meta {
+  font-size: 24rpx;
+  color: rgba($ink, 0.6);
+  margin-top: 4rpx;
+}
+
+.bill-settlements {
+  margin-top: 8rpx;
+  padding: 8rpx 12rpx;
+  background: rgba($ink, 0.05);
+  border-radius: 8rpx;
+}
+
+.settlement-text {
+  font-size: 22rpx;
+  color: $magic-burgundy;
+  display: block;
+  margin-bottom: 4rpx;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.bill-amount {
+  .bill-amount-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $magic-burgundy;
+  }
+}
+
+.bill-action-section {
+  margin-top: 24rpx;
+}
+
+.add-bill-btn {
+  background: linear-gradient(135deg, $magic-gold, darken($magic-gold, 15%));
+  border-radius: 12rpx;
+  padding: 24rpx;
+  text-align: center;
+
+  .add-bill-text {
+    font-size: 32rpx;
+    color: #1a0f0a;
+    font-weight: bold;
+  }
+}
+
+// 守护者特权
+.guardian-section {
+  margin-top: 24rpx;
+}
+
+.guardian-actions {
+  background: rgba($parchment, 0.95);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+}
+
+.guardian-btn {
+  background: rgba($magic-burgundy, 0.1);
+  border: 2rpx solid $magic-burgundy;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  text-align: center;
+  margin-bottom: 12rpx;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .guardian-btn-text {
+    font-size: 28rpx;
+    color: $magic-burgundy;
+    font-weight: bold;
+  }
+}
+
+// 记账表单弹窗
+.bill-form-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.bill-form-content {
+  width: 90%;
+  max-width: 600rpx;
+  background: rgba($parchment, 0.98);
+  border-radius: 20rpx;
+  padding: 32rpx;
+  border: 3rpx solid rgba($magic-gold, 0.4);
+}
+
+.bill-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.bill-form-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+}
+
+.bill-form-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($ink, 0.1);
+  border-radius: 50%;
+
+  .close-icon {
+    font-size: 28rpx;
+    color: $ink;
+  }
+}
+
+.bill-form-item {
+  margin-bottom: 24rpx;
+}
+
+.bill-form-label {
+  font-size: 28rpx;
+  color: rgba($ink, 0.7);
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.bill-form-input {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  background: rgba($ink, 0.05);
+  border: 2rpx solid rgba($ink, 0.15);
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  color: $ink;
+
+  &::placeholder {
+    color: rgba($ink, 0.4);
+  }
+}
+
+// 咒语类型选择
+.spell-type-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.spell-type-btn {
+  flex: 1;
+  padding: 20rpx;
+  background: rgba($ink, 0.05);
+  border: 2rpx solid rgba($ink, 0.15);
+  border-radius: 12rpx;
+  text-align: center;
+
+  &.active {
+    background: rgba($magic-gold, 0.15);
+    border-color: $magic-gold;
+  }
+
+  .spell-type-text {
+    font-size: 28rpx;
+    color: $ink;
+    font-weight: bold;
+  }
+}
+
+// 提交按钮
+.bill-form-submit {
+  background: linear-gradient(135deg, $magic-burgundy, darken($magic-burgundy, 10%));
+  border-radius: 12rpx;
+  padding: 24rpx;
+  text-align: center;
+  margin-top: 32rpx;
+
+  &.loading {
+    opacity: 0.7;
+  }
+
+  .submit-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: $parchment;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes unfold {
+  from {
+    transform: scale(0.8) rotateX(90deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotateX(0);
+    opacity: 1;
+  }
+}

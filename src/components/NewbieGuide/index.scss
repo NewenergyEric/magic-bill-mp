@@ -1,0 +1,184 @@
+// 新手引导样式
+
+$magic-gold: #d4af37;
+$magic-burgundy: #740001;
+$parchment: #f4e4bc;
+$ink: #2c1e1a;
+
+.guide-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40rpx;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  
+  &.visible {
+    opacity: 1;
+  }
+}
+
+.guide-content {
+  width: 100%;
+  max-width: 600rpx;
+  background: $parchment;
+  border-radius: 32rpx;
+  padding: 60rpx 40rpx;
+  text-align: center;
+  position: relative;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: all 0.4s ease;
+  
+  &.visible {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.guide-skip {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  padding: 12rpx 24rpx;
+  
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.skip-text {
+  font-size: 26rpx;
+  color: rgba($ink, 0.4);
+}
+
+.guide-icon-wrap {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin: 0 auto 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-icon {
+  font-size: 100rpx;
+  position: relative;
+  z-index: 2;
+  animation: icon-float 2s ease-in-out infinite;
+}
+
+.icon-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200rpx;
+  height: 200rpx;
+  background: radial-gradient(circle, rgba($magic-gold, 0.3) 0%, transparent 70%);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16rpx); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.guide-title {
+  display: block;
+  font-size: 42rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+  margin-bottom: 16rpx;
+}
+
+.guide-desc {
+  display: block;
+  font-size: 30rpx;
+  color: rgba($ink, 0.7);
+  line-height: 1.6;
+  margin-bottom: 48rpx;
+}
+
+.guide-dots {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 48rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: rgba($ink, 0.2);
+  transition: all 0.3s ease;
+  
+  &.active {
+    width: 48rpx;
+    border-radius: 8rpx;
+    background: $magic-burgundy;
+  }
+  
+  &.done {
+    background: $magic-gold;
+  }
+}
+
+.guide-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 0;
+  min-height: 80rpx;
+  background: #1a0f0a;
+  border-radius: 12rpx;
+  border: 3rpx solid $magic-gold;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.btn-text {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #d4af37 !important;
+}
+
+// 装饰粒子
+.particle {
+  position: absolute;
+  font-size: 32rpx;
+  opacity: 0.6;
+  animation: particle-float 3s ease-in-out infinite;
+}
+
+.p1 { top: 15%; left: 10%; animation-delay: 0s; }
+.p2 { top: 25%; right: 15%; animation-delay: 0.5s; }
+.p3 { bottom: 20%; left: 15%; animation-delay: 1s; }
+
+@keyframes particle-float {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg); 
+    opacity: 0.6;
+  }
+  50% { 
+    transform: translateY(-30rpx) rotate(10deg); 
+    opacity: 1;
+  }
+}

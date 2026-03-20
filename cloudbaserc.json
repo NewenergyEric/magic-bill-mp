@@ -1,0 +1,29 @@
+{
+  "version": "2.0",
+  "envId": "cloudbase-0goar8t81b4d36ac",
+  "functionRoot": "cloudFunctions",
+  "functions": [
+    {
+      "name": "login",
+      "timeout": 10,
+      "envVariables": {},
+      "runtime": "Nodejs16.13"
+    },
+    {
+      "name": "contract",
+      "timeout": 15,
+      "envVariables": {},
+      "runtime": "Nodejs16.13"
+    },
+    {
+      "name": "bill",
+      "timeout": 15,
+      "envVariables": {},
+      "runtime": "Nodejs16.13"
+    }
+  ],
+  "framework": {
+    "name": "magic-bill",
+    "plugins": {}
+  }
+}

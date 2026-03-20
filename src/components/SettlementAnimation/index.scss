@@ -1,0 +1,288 @@
+// 结算动画 - 魔法平衡
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.settlement-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+
+  .settlement-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg,
+      #1a0a2e 0%,
+      #2d1850 30%,
+      #191970 60%,
+      #0a0a1e 100%
+    );
+    animation: bgPulse 2s ease-in-out infinite;
+  }
+
+  // 对冲光束
+  .light-beams {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .light-beam {
+      position: relative;
+      width: 150px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+
+      &.left-beam {
+        animation: beamLeft 2s ease-in-out infinite;
+        .beam-core {
+          background: linear-gradient(90deg, #722f37, #ff6b6b);
+          box-shadow: 0 0 20px rgba(114, 47, 55, 0.8);
+        }
+        .beam-glow {
+          background: linear-gradient(90deg, transparent, rgba(114, 47, 55, 0.5));
+        }
+      }
+
+      &.right-beam {
+        animation: beamRight 2s ease-in-out infinite;
+        .beam-core {
+          background: linear-gradient(90deg, #c9a227, #ffd700);
+          box-shadow: 0 0 20px rgba(201, 162, 39, 0.8);
+        }
+        .beam-glow {
+          background: linear-gradient(90deg, rgba(201, 162, 39, 0.5), transparent);
+        }
+      }
+
+      .beam-core {
+        position: absolute;
+        height: 8px;
+        width: 100%;
+        border-radius: 4px;
+      }
+
+      .beam-glow {
+        position: absolute;
+        height: 30px;
+        width: 100%;
+        filter: blur(10px);
+        opacity: 0.6;
+      }
+    }
+  }
+
+  // 碰撞中心
+  .collision-center {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .collision-flash {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle,
+        #fff 0%,
+        #ffd700 30%,
+        transparent 70%
+      );
+      border-radius: 50%;
+      animation: flashPulse 0.5s ease-out infinite;
+    }
+
+    .collision-ring {
+      position: absolute;
+      border: 3px solid rgba(201, 162, 39, 0.6);
+      border-radius: 50%;
+      animation: ringExpand 1.5s ease-out infinite;
+
+      &.ring-1 {
+        width: 80px;
+        height: 80px;
+        animation-delay: 0s;
+      }
+      &.ring-2 {
+        width: 120px;
+        height: 120px;
+        animation-delay: 0.3s;
+      }
+      &.ring-3 {
+        width: 160px;
+        height: 160px;
+        animation-delay: 0.6s;
+      }
+    }
+  }
+
+  // 结算信息
+  .settlement-info {
+    position: absolute;
+    bottom: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    .settlement-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: rgba(245, 230, 200, 0.95);
+      padding: 15px 30px;
+      border-radius: 25px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(201, 162, 39, 0.5);
+      animation: itemAppear 0.5s ease-out forwards;
+      opacity: 0;
+
+      .from-name {
+        font-size: 16px;
+        color: #722f37;
+        font-weight: bold;
+      }
+
+      .arrow {
+        font-size: 20px;
+        color: #c9a227;
+      }
+
+      .to-name {
+        font-size: 16px;
+        color: #2d5016;
+        font-weight: bold;
+      }
+
+      .settle-amount {
+        font-size: 20px;
+        color: #c9a227;
+        font-weight: bold;
+      }
+
+      .balance-text {
+        font-size: 24px;
+        color: #2d5016;
+        font-weight: bold;
+      }
+    }
+  }
+
+  // 纸屑容器
+  .confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+
+    .confetti {
+      position: absolute;
+      top: -20px;
+      border-radius: 2px;
+      animation: confettiFall 3s ease-out forwards;
+      animation-delay: var(--delay, 0s);
+    }
+  }
+
+  // 文字
+  .settlement-text {
+    position: absolute;
+    bottom: 15%;
+    animation: textAppear 1s ease-out 0.5s forwards;
+    opacity: 0;
+
+    .equilibrium-word {
+      font-size: 32px;
+      font-weight: bold;
+      color: #c9a227;
+      text-shadow: 0 0 30px rgba(201, 162, 39, 0.8),
+                  0 0 60px rgba(201, 162, 39, 0.4);
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes bgPulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+@keyframes beamLeft {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(30px); }
+}
+
+@keyframes beamRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-30px); }
+}
+
+@keyframes flashPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.8; }
+}
+
+@keyframes ringExpand {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes itemAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes textAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

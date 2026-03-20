@@ -1,0 +1,139 @@
+@import '@/styles/variables.scss';
+
+// 魔法风格按钮基础样式
+.magic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  
+  // 禁用状态
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  // 图标
+  .btn-icon {
+    margin-right: 8rpx;
+  }
+  
+  .btn-text {
+    white-space: nowrap;
+  }
+}
+
+// 尺寸
+.magic-btn-small {
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  
+  .btn-icon {
+    font-size: 24rpx;
+  }
+}
+
+.magic-btn-medium {
+  padding: 20rpx 36rpx;
+  font-size: 28rpx;
+  
+  .btn-icon {
+    font-size: 28rpx;
+  }
+}
+
+.magic-btn-large {
+  padding: 28rpx 48rpx;
+  font-size: 32rpx;
+  
+  .btn-icon {
+    font-size: 32rpx;
+  }
+}
+
+// 类型样式
+.magic-btn-primary {
+  background: linear-gradient(135deg, $magic-burgundy 0%, darken($magic-burgundy, 15%) 100%);
+  color: $magic-gold;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.3);
+  
+  &:active {
+    background: linear-gradient(135deg, darken($magic-burgundy, 10%) 0%, darken($magic-burgundy, 20%) 100%);
+    transform: scale(0.98);
+  }
+}
+
+.magic-btn-secondary {
+  background: rgba($parchment, 0.1);
+  color: $parchment;
+  border: 2rpx solid rgba($parchment, 0.2);
+  
+  &:active {
+    background: rgba($parchment, 0.15);
+    transform: scale(0.98);
+  }
+}
+
+.magic-btn-danger {
+  background: rgba(#e91e63, 0.15);
+  color: #e91e63;
+  border: 2rpx solid rgba(#e91e63, 0.3);
+  
+  &:active {
+    background: rgba(#e91e63, 0.25);
+    transform: scale(0.98);
+  }
+}
+
+.magic-btn-success {
+  background: rgba(#4caf50, 0.15);
+  color: #4caf50;
+  border: 2rpx solid rgba(#4caf50, 0.3);
+  
+  &:active {
+    background: rgba(#4caf50, 0.25);
+    transform: scale(0.98);
+  }
+}
+
+.magic-btn-ghost {
+  background: transparent;
+  color: rgba($parchment, 0.7);
+  border: 2rpx dashed rgba($parchment, 0.3);
+  
+  &:active {
+    background: rgba($parchment, 0.05);
+  }
+}
+
+// 按钮组
+.magic-btn-group {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+  
+  &.magic-btn-group-left {
+    justify-content: flex-start;
+  }
+  
+  &.magic-btn-group-center {
+    justify-content: center;
+  }
+  
+  &.magic-btn-group-right {
+    justify-content: flex-end;
+  }
+  
+  &.magic-btn-group-spread {
+    justify-content: space-between;
+    
+    .magic-btn {
+      flex: 1;
+    }
+  }
+}

@@ -1,0 +1,158 @@
+// 活点记账全局样式规范
+// 确保所有页面使用一致的设计
+
+// ========== 颜色变量 ==========
+$magic-gold: #d4af37;
+$magic-burgundy: #740001;
+$magic-navy: #1a1a2e;
+$dark-purple: #1a0f0a;
+$parchment: #f4e4bc;
+$ink: #2c1810;
+
+// 功能色
+$color-success: #4caf50;
+$color-danger: #e91e63;
+$color-warning: #ff9800;
+$color-info: #2196f3;
+
+// ========== 字体规范 ==========
+// 标题
+$font-size-title-large: 40rpx;   // 大标题
+$font-size-title: 36rpx;         // 标题
+$font-size-title-small: 32rpx;   // 小标题
+
+// 正文
+$font-size-body: 30rpx;          // 正文
+$font-size-body-small: 28rpx;    // 小正文
+$font-size-caption: 26rpx;       // 说明文字
+$font-size-hint: 24rpx;          // 提示文字
+$font-size-tiny: 22rpx;          // 极小文字
+
+// ========== 间距规范 ==========
+$spacing-xs: 8rpx;
+$spacing-sm: 12rpx;
+$spacing-md: 16rpx;
+$spacing-lg: 24rpx;
+$spacing-xl: 32rpx;
+$spacing-xxl: 48rpx;
+
+// ========== 圆角规范 ==========
+$radius-sm: 8rpx;
+$radius-md: 12rpx;
+$radius-lg: 16rpx;
+$radius-xl: 24rpx;
+$radius-full: 999rpx;
+
+// ========== 卡片样式 ==========
+// 羊皮纸卡片基础样式
+@mixin parchment-card {
+  background: linear-gradient(135deg, rgba($parchment, 0.08) 0%, rgba($parchment, 0.03) 100%);
+  border: 2rpx solid rgba($magic-gold, 0.15);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+}
+
+// 深色卡片
+@mixin dark-card {
+  background: rgba($dark-purple, 0.8);
+  border: 2rpx solid rgba($magic-gold, 0.2);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+}
+
+// ========== 按钮样式 ==========
+// 主要按钮
+@mixin btn-primary {
+  background: linear-gradient(135deg, $magic-burgundy 0%, darken($magic-burgundy, 15%) 100%);
+  color: $magic-gold;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-body-small;
+  font-weight: bold;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+// 次要按钮
+@mixin btn-secondary {
+  background: rgba($parchment, 0.1);
+  color: $parchment;
+  border: 2rpx solid rgba($parchment, 0.2);
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-body-small;
+  font-weight: bold;
+  
+  &:active {
+    background: rgba($parchment, 0.15);
+  }
+}
+
+// 危险按钮
+@mixin btn-danger {
+  background: rgba($color-danger, 0.15);
+  color: $color-danger;
+  border: 2rpx solid rgba($color-danger, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-body-small;
+  font-weight: bold;
+  
+  &:active {
+    background: rgba($color-danger, 0.25);
+  }
+}
+
+// 成功按钮
+@mixin btn-success {
+  background: rgba($color-success, 0.15);
+  color: $color-success;
+  border: 2rpx solid rgba($color-success, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-body-small;
+  font-weight: bold;
+  
+  &:active {
+    background: rgba($color-success, 0.25);
+  }
+}
+
+// ========== 文字样式 ==========
+// 标题文字
+@mixin text-title {
+  font-size: $font-size-title;
+  font-weight: bold;
+  color: $parchment;
+}
+
+// 正文文字
+@mixin text-body {
+  font-size: $font-size-body-small;
+  color: rgba($parchment, 0.85);
+}
+
+// 说明文字
+@mixin text-hint {
+  font-size: $font-size-hint;
+  color: rgba($parchment, 0.5);
+}
+
+// 金额文字
+@mixin text-amount {
+  font-size: $font-size-title;
+  font-weight: bold;
+  color: $magic-gold;
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+}
+
+// ========== 头像尺寸 ==========
+$avatar-tiny: 36rpx;
+$avatar-small: 48rpx;
+$avatar-medium: 64rpx;
+$avatar-large: 96rpx;
+$avatar-xlarge: 128rpx;

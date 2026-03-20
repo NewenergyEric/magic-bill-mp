@@ -1,0 +1,250 @@
+// 离线状态指示器 - 自动书写羽毛笔
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.offline-indicator {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 9999;
+  animation: slideIn 0.5s ease;
+
+  &.sync-complete {
+    .sync-text {
+      animation: fadeText 1s ease forwards;
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// 羽毛笔容器
+.quill-container {
+  position: relative;
+  width: 80px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.fading {
+    animation: fadeOut 1s ease forwards;
+
+    .golden-glow {
+      animation: glowFade 1s ease forwards;
+    }
+  }
+
+  &.writing {
+    animation: writingShake 0.5s ease-in-out infinite;
+
+    .quill-body {
+      animation: quillWrite 0.3s ease-in-out infinite;
+    }
+
+    .ink-trail {
+      .ink-drop {
+        animation: inkDrop 1s ease-in-out infinite;
+      }
+      .drop-1 { animation-delay: 0s; }
+      .drop-2 { animation-delay: 0.3s; }
+      .drop-3 { animation-delay: 0.6s; }
+    }
+  }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes glowFade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes writingShake {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+@keyframes quillWrite {
+  0%, 100% { transform: translateY(0) rotate(-45deg); }
+  50% { transform: translateY(5px) rotate(-45deg); }
+}
+
+// 纸背景
+.paper-bg {
+  position: absolute;
+  width: 50px;
+  height: 60px;
+  background: linear-gradient(145deg, #f5e6c8, #e8d4a8);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: -1;
+
+  .writing-line {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: rgba(114, 47, 55, 0.2);
+    border-radius: 1px;
+
+    &.line-1 { top: 12px; width: 60%; }
+    &.line-2 { top: 24px; width: 80%; }
+    &.line-3 { top: 36px; width: 40%; }
+  }
+}
+
+// 羽毛笔身体
+.quill-body {
+  position: relative;
+  width: 60px;
+  height: 80px;
+  transform: rotate(-45deg);
+
+  .quill-feather {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .feather {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 20px solid #f5e6c8;
+      margin: -2px 0;
+      opacity: 0.9;
+
+      &:nth-child(1) {
+        border-bottom-color: rgba(245, 230, 200, 0.9);
+      }
+      &:nth-child(2) {
+        border-bottom-color: rgba(235, 220, 190, 0.8);
+      }
+      &:nth-child(3) {
+        border-bottom-color: rgba(225, 210, 180, 0.7);
+      }
+    }
+  }
+
+  .quill-shaft {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 40px;
+    background: linear-gradient(180deg, #8b7355 0%, #6b5344 100%);
+    border-radius: 2px;
+  }
+
+  .quill-nib {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 12px solid #2d1810;
+  }
+}
+
+// 墨迹
+.ink-trail {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -2;
+
+  .ink-drop {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #2d1810;
+    border-radius: 50%;
+    opacity: 0;
+
+    &.drop-1 { left: -10px; top: 0; }
+    &.drop-2 { left: 0; top: 5px; }
+    &.drop-3 { left: 10px; top: 0; }
+  }
+}
+
+@keyframes inkDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+// 金光（联网消失时）
+.golden-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.3; }
+}
+
+// 文字
+.offline-text,
+.sync-text {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #f5e6c8;
+  background: rgba(45, 24, 16, 0.9);
+  padding: 4px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sync-text {
+  animation: fadeText 1s ease forwards;
+}
+
+@keyframes fadeText {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}

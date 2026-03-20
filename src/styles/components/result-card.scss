@@ -1,0 +1,479 @@
+// 施咒结果和账单详情共用的卡片样式
+$magic-gold: #d4af37;
+$magic-burgundy: #740001;
+$parchment: #f4e4bc;
+$ink: #2c1e1a;
+
+.result-card {
+  width: 90%;
+  max-width: calc(100vw - 80rpx);
+  background: $parchment;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.result-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+}
+
+.result-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($ink, 0.1);
+  border-radius: 50%;
+}
+
+.close-icon {
+  font-size: 32rpx;
+  color: rgba($ink, 0.5);
+}
+
+.result-event {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+  text-align: center;
+  margin-bottom: 24rpx;
+  padding: 16rpx;
+  
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.result-main {
+  text-align: center;
+  padding: 32rpx;
+  background: rgba($magic-burgundy, 0.1);
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.result-label {
+  font-size: 28rpx;
+  color: rgba($ink, 0.6);
+  margin-bottom: 12rpx;
+}
+
+.result-amount {
+  font-size: 64rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+}
+
+.result-details {
+  display: flex;
+  justify-content: space-around;
+  padding: 24rpx 0;
+  border-top: 2rpx solid rgba($ink, 0.1);
+  border-bottom: 2rpx solid rgba($ink, 0.1);
+  margin-bottom: 24rpx;
+}
+
+.detail-item {
+  text-align: center;
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: rgba($ink, 0.5);
+  margin-bottom: 8rpx;
+}
+
+.detail-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $ink;
+  
+  &.highlight {
+    color: $magic-burgundy;
+  }
+}
+
+.payment-hint {
+  background: rgba($magic-gold, 0.15);
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.hint-text {
+  font-size: 26rpx;
+  color: $ink;
+}
+
+.result-wizards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.result-wizard-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(25% - 12rpx);
+  position: relative;
+  
+  &.is-payer {
+    .wizard-avatar {
+      border-color: $magic-gold;
+      box-shadow: 0 0 12rpx rgba($magic-gold, 0.5);
+    }
+  }
+}
+
+.payer-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  font-size: 18rpx;
+  color: white;
+  background: $magic-burgundy;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+}
+
+.result-wizard-name {
+  font-size: 22rpx;
+  color: $ink;
+  margin-top: 8rpx;
+  text-align: center;
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+// 主操作按钮行 - 突出显示
+.result-actions-primary {
+  display: flex;
+  gap: 16rpx;
+  
+  .result-btn {
+    flex: 1;
+    min-height: 88rpx;
+  }
+}
+
+// 次操作按钮行 - 低调显示
+.result-actions-secondary {
+  display: flex;
+  gap: 12rpx;
+  
+  .result-btn {
+    flex: 1;
+    min-height: 72rpx;
+    opacity: 0.75;
+    
+    &:active {
+      opacity: 1;
+    }
+  }
+}
+
+// 统一按钮基础样式
+.result-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 16rpx;
+  min-height: 80rpx;
+  min-width: 80rpx;
+  background: transparent !important;
+  border-radius: 12rpx;
+  position: relative;
+  overflow: hidden;
+  
+  // 顶部金色高光
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3rpx;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba($magic-gold, 0.4) 20%, 
+      rgba($magic-gold, 0.6) 50%, 
+      rgba($magic-gold, 0.4) 80%, 
+      transparent 100%
+    );
+  }
+  
+  &::after {
+    border: none !important;
+  }
+  
+  Text {
+    font-size: 28rpx;
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// 入账按钮 - 主色调
+.result-save-btn {
+  background: linear-gradient(180deg, 
+    rgba($magic-burgundy, 0.95) 0%, 
+    rgba($magic-burgundy, 0.75) 100%
+  ) !important;
+  border: 2rpx solid rgba($magic-gold, 0.4) !important;
+  box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.3);
+  
+  Text {
+    color: $magic-gold;
+  }
+}
+
+// 分享按钮
+.result-share-btn {
+  background: linear-gradient(180deg, 
+    rgba($magic-gold, 0.2) 0%, 
+    rgba($magic-gold, 0.1) 100%
+  ) !important;
+  border: 2rpx solid rgba($magic-gold, 0.5) !important;
+  
+  Text {
+    color: darken($magic-gold, 5%);
+  }
+}
+
+// 重置按钮
+.result-reset-btn {
+  background: rgba(255, 152, 0, 0.15) !important;
+  border: 2rpx solid rgba(255, 152, 0, 0.4) !important;
+  
+  Text {
+    color: #E65100;
+  }
+}
+
+// 归档按钮
+.result-archive-btn {
+  background: rgba(100, 149, 237, 0.15) !important;
+  border: 2rpx solid rgba(100, 149, 237, 0.4) !important;
+  
+  Text {
+    color: #1565C0;
+  }
+}
+
+// 继续按钮
+.result-confirm-btn {
+  background: rgba($ink, 0.1) !important;
+  border: 2rpx solid rgba($ink, 0.3) !important;
+  
+  Text {
+    color: rgba($ink, 0.7);
+  }
+}
+
+.settlements-section {
+  background: rgba($magic-gold, 0.1);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: $magic-burgundy;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.no-settlement {
+  font-size: 28rpx;
+  color: rgba($ink, 0.6);
+  text-align: center;
+  padding: 20rpx 0;
+  display: block;
+}
+
+.settlement-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12rpx;
+  padding: 16rpx;
+  margin-bottom: 12rpx;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.settlement-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100rpx;
+  
+  .user-name {
+    font-size: 22rpx;
+    color: $ink;
+    margin-top: 8rpx;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+}
+
+.settlement-arrow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16rpx;
+  
+  .arrow-amount {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: $magic-burgundy;
+    margin-bottom: 4rpx;
+  }
+  
+  .arrow-icon {
+    font-size: 32rpx;
+    color: rgba($magic-burgundy, 0.5);
+    line-height: 1;
+  }
+}
+
+.result-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400; /* Increased z-index to show over ledger detail modal */
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+// 支付记录区域
+.payment-records-section {
+  margin-bottom: 24rpx;
+  
+  .section-title {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: $magic-burgundy;
+    margin-bottom: 16rpx;
+  }
+}
+
+.payment-records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.payment-record-item {
+  background: rgba($ink, 0.05);
+  border-radius: 12rpx;
+  padding: 16rpx;
+  border-left: 3rpx solid transparent;
+  
+  &.is-payer {
+    border-left-color: $magic-gold;
+    background: rgba($magic-gold, 0.08);
+  }
+  
+  .record-user {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    margin-bottom: 12rpx;
+    
+    .record-name {
+      font-size: 28rpx;
+      font-weight: bold;
+      color: $ink;
+    }
+    
+    .payer-tag {
+      font-size: 20rpx;
+      color: $magic-gold;
+      background: rgba($magic-gold, 0.15);
+      padding: 2rpx 10rpx;
+      border-radius: 6rpx;
+    }
+  }
+  
+  .record-amounts {
+    display: flex;
+    justify-content: space-around;
+    padding: 12rpx;
+    background: rgba($ink, 0.03);
+    border-radius: 8rpx;
+    
+    .record-amount-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .record-label {
+        font-size: 20rpx;
+        color: rgba($ink, 0.5);
+        margin-bottom: 4rpx;
+      }
+      
+      .record-value {
+        font-size: 26rpx;
+        font-weight: bold;
+        color: $ink;
+        
+        &.positive {
+          color: $magic-gold;
+        }
+        
+        &.receive {
+          color: #4CAF50;
+        }
+        
+        &.pay {
+          color: #E91E63;
+        }
+      }
+    }
+  }
+}
+
+// 参与巫师网格布局
+.wizards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}

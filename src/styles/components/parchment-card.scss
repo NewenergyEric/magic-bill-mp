@@ -1,0 +1,183 @@
+// 羊皮纸卡片组件样式
+// 游戏化UI核心组件
+
+.parchment-card {
+  background: linear-gradient(
+    145deg,
+    rgba($parchment, 0.95) 0%,
+    rgba(darken($parchment, 5%), 0.9) 50%,
+    rgba($parchment, 0.85) 100%
+  );
+  border-radius: 16rpx;
+  padding: 32rpx;
+  position: relative;
+  overflow: hidden;
+
+  // 羊皮纸纹理效果（通过伪元素实现）
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  // 金色边框
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16rpx;
+    border: 2rpx solid rgba($magic-gold, 0.3);
+    pointer-events: none;
+  }
+
+  // 边角装饰
+  .card-corner {
+    position: absolute;
+    width: 40rpx;
+    height: 40rpx;
+    border-color: rgba($magic-gold, 0.4);
+    border-style: solid;
+    border-width: 0;
+
+    &.top-left {
+      top: 8rpx;
+      left: 8rpx;
+      border-top-width: 3rpx;
+      border-left-width: 3rpx;
+      border-top-left-radius: 8rpx;
+    }
+
+    &.top-right {
+      top: 8rpx;
+      right: 8rpx;
+      border-top-width: 3rpx;
+      border-right-width: 3rpx;
+      border-top-right-radius: 8rpx;
+    }
+
+    &.bottom-left {
+      bottom: 8rpx;
+      left: 8rpx;
+      border-bottom-width: 3rpx;
+      border-left-width: 3rpx;
+      border-bottom-left-radius: 8rpx;
+    }
+
+    &.bottom-right {
+      bottom: 8rpx;
+      right: 8rpx;
+      border-bottom-width: 3rpx;
+      border-right-width: 3rpx;
+      border-bottom-right-radius: 8rpx;
+    }
+  }
+}
+
+// 魔法光晕卡片
+.magic-glow-card {
+  background: linear-gradient(
+    145deg,
+    rgba($parchment, 0.9) 0%,
+    rgba($parchment, 0.85) 100%
+  );
+  border-radius: 20rpx;
+  padding: 32rpx;
+  position: relative;
+  box-shadow:
+    0 0 30rpx rgba($magic-gold, 0.15),
+    0 8rpx 32rpx rgba(0, 0, 0, 0.3);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2rpx;
+    left: -2rpx;
+    right: -2rpx;
+    bottom: -2rpx;
+    background: linear-gradient(
+      135deg,
+      rgba($magic-gold, 0.4) 0%,
+      rgba($magic-burgundy, 0.3) 50%,
+      rgba($magic-gold, 0.4) 100%
+    );
+    border-radius: 22rpx;
+    z-index: -1;
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+}
+
+// 账单卡片（带图标装饰）
+.bill-card {
+  background: linear-gradient(
+    145deg,
+    rgba($parchment, 0.92) 0%,
+    rgba($parchment, 0.88) 100%
+  );
+  border-radius: 16rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  // 左侧图标装饰
+  .bill-icon-wrap {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $magic-burgundy, darken($magic-burgundy, 10%));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.3);
+
+    .icon-text {
+      font-size: 36rpx;
+    }
+  }
+
+  // 账单信息
+  .bill-content {
+    flex: 1;
+  }
+
+  // 金额显示
+  .bill-amount {
+    text-align: right;
+
+    .amount-value {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: $ink;
+    }
+
+    .amount-label {
+      font-size: 22rpx;
+      color: rgba($ink, 0.6);
+    }
+  }
+}

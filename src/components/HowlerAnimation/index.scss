@@ -1,0 +1,319 @@
+// 吼叫信动画 - 异议申诉
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.howler-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(139, 0, 0, 0.95); // 吼叫信红
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: howlerFadeIn 0.3s ease;
+
+  // 背景红光
+  .howler-bg-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle,
+      rgba(255, 100, 50, 0.4) 0%,
+      rgba(139, 0, 0, 0.2) 50%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    animation: howlerBgPulse 0.5s ease-in-out infinite;
+  }
+
+  // 信封容器
+  .envelope-container {
+    position: relative;
+    width: 250px;
+    height: 200px;
+    animation: envelopeShake 0.1s ease-in-out infinite;
+
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 100%;
+
+      // 信封封口（三角形）
+      .envelope-flap {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 125px solid transparent;
+        border-right: 125px solid transparent;
+        border-top: 80px solid #8B0000;
+        filter: drop-shadow(0 -5px 10px rgba(0, 0, 0, 0.3));
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: -80px;
+          left: -125px;
+          width: 250px;
+          height: 80px;
+          background: linear-gradient(180deg,
+            rgba(139, 0, 0, 0.8) 0%,
+            rgba(255, 50, 50, 0.6) 100%
+          );
+        }
+      }
+
+      // 信封身体
+      .envelope-body {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 130px;
+        background: linear-gradient(180deg,
+          #8B0000 0%,
+          #5a0000 100%
+        );
+        border-radius: 0 0 8px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        // 嘴巴
+        .mouth {
+          position: relative;
+          width: 120px;
+          height: 60px;
+          background: #2d1810;
+          border-radius: 0 0 60px 60px;
+          animation: mouthOpen 0.3s ease-in-out infinite;
+
+          .mouth-inner {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: center;
+
+            .tooth {
+              width: 20px;
+              height: 25px;
+              background: #f5e6c8;
+              border-radius: 3px 3px 0 0;
+
+              &.tooth-left {
+                margin-right: 5px;
+              }
+              &.tooth-right {
+                margin-left: 5px;
+              }
+            }
+
+            .tongue {
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 40px;
+              height: 20px;
+              background: #ff6b6b;
+              border-radius: 0 0 20px 20px;
+              animation: tongueWag 0.2s ease-in-out infinite;
+            }
+          }
+        }
+      }
+
+      // 愤怒的眉毛
+      .angry-eyebrows {
+        position: absolute;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 140px;
+        display: flex;
+        justify-content: space-between;
+
+        .eyebrow {
+          width: 50px;
+          height: 8px;
+          background: #2d1810;
+          border-radius: 4px;
+
+          &.left {
+            transform: rotate(25deg);
+          }
+          &.right {
+            transform: rotate(-25deg);
+          }
+        }
+      }
+
+      // 眼睛
+      .angry-eyes {
+        position: absolute;
+        top: 85px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        display: flex;
+        justify-content: space-between;
+
+        .eye {
+          width: 30px;
+          height: 30px;
+          background: #fff;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: eyeGlare 0.3s ease-in-out infinite;
+
+          .pupil {
+            width: 15px;
+            height: 15px;
+            background: #2d1810;
+            border-radius: 50%;
+            animation: pupilDilate 0.5s ease-in-out infinite;
+          }
+        }
+      }
+    }
+
+    // 火焰效果
+    .flames {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+
+      .flame {
+        position: absolute;
+        bottom: 0;
+        width: 30px;
+        background: linear-gradient(180deg,
+          rgba(255, 200, 50, 0.8) 0%,
+          rgba(255, 100, 50, 0.6) 50%,
+          transparent 100%
+        );
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        animation: flameFlicker 0.2s ease-in-out infinite alternate;
+
+        &.flame-1 {
+          left: 30px;
+          height: 50px;
+          animation-delay: 0s;
+        }
+        &.flame-2 {
+          left: 85px;
+          height: 60px;
+          animation-delay: 0.1s;
+        }
+        &.flame-3 {
+          right: 30px;
+          height: 45px;
+          animation-delay: 0.2s;
+        }
+      }
+    }
+  }
+
+  // 账单信息
+  .bill-info {
+    margin-top: 30px;
+    text-align: center;
+
+    .bill-text {
+      font-size: 16px;
+      color: rgba(245, 230, 200, 0.8);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .bill-amount {
+      font-size: 32px;
+      font-weight: bold;
+      color: #f5e6c8;
+    }
+  }
+
+  // 咆哮文字
+  .howler-text {
+    margin-top: 30px;
+    animation: textShake 0.1s ease-in-out infinite;
+
+    .roar-word {
+      font-size: 36px;
+      font-weight: bold;
+      color: #f5e6c8;
+      text-shadow: 0 0 20px rgba(255, 200, 50, 0.8),
+                   0 0 40px rgba(255, 100, 50, 0.6);
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes howlerFadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes howlerBgPulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes envelopeShake {
+  0%, 100% { transform: translateX(-3px) rotate(-1deg); }
+  50% { transform: translateX(3px) rotate(1deg); }
+}
+
+@keyframes mouthOpen {
+  0%, 100% { height: 60px; }
+  50% { height: 70px; }
+}
+
+@keyframes tongueWag {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(5px); }
+}
+
+@keyframes eyeGlare {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes pupilDilate {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes flameFlicker {
+  0% { transform: scaleY(1) scaleX(1); opacity: 0.8; }
+  100% { transform: scaleY(1.2) scaleX(0.9); opacity: 1; }
+}
+
+@keyframes textShake {
+  0%, 100% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+}

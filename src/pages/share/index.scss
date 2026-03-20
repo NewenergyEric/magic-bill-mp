@@ -1,0 +1,634 @@
+@import '@/styles/variables.scss';
+
+.share-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $dark-purple 0%, $magic-burgundy 50%, #2a1a1a 100%);
+  padding-bottom: 140rpx;
+  
+  &.loading, &.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: rgba($parchment, 0.6);
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 32rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: rgba($parchment, 0.6);
+  margin-bottom: 48rpx;
+}
+
+.go-home-btn {
+  background: $magic-burgundy;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  color: $magic-gold;
+  font-size: 28rpx;
+  padding: 24rpx 48rpx;
+  border-radius: 12rpx;
+}
+
+.share-scroll {
+  height: calc(100vh - 140rpx);
+}
+
+.share-content {
+  padding: 32rpx;
+}
+
+// 魔法羊皮纸卡片
+.parchment-card {
+  background: linear-gradient(145deg, #f5e6c8 0%, #e8d4a8 50%, #dcc89a 100%);
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  margin-bottom: 24rpx;
+  position: relative;
+  box-shadow: 
+    0 8rpx 32rpx rgba(0, 0, 0, 0.3),
+    inset 0 2rpx 4rpx rgba(255, 255, 255, 0.3);
+  
+  // 羊皮纸纹理效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    border-radius: 24rpx;
+    pointer-events: none;
+  }
+}
+
+// 装饰线条
+.card-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 0;
+  
+  &.top {
+    margin-bottom: 24rpx;
+  }
+  
+  &.bottom {
+    margin-top: 32rpx;
+  }
+}
+
+.deco-line {
+  flex: 1;
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent 0%, #8b6914 50%, transparent 100%);
+}
+
+.deco-icon {
+  font-size: 32rpx;
+  margin: 0 24rpx;
+  color: #6b4a0a;
+}
+
+// 卡片头部
+.card-header {
+  text-align: center;
+  padding-bottom: 24rpx;
+  border-bottom: 2rpx dashed rgba(107, 74, 10, 0.3);
+}
+
+.event-name {
+  font-size: 44rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  display: block;
+  margin-bottom: 12rpx;
+  letter-spacing: 4rpx;
+}
+
+.event-date {
+  font-size: 26rpx;
+  color: #6b4a0a;
+  letter-spacing: 2rpx;
+}
+
+// 总花费区域
+.total-section {
+  text-align: center;
+  padding: 40rpx 24rpx;
+  margin: 24rpx 0;
+  background: rgba(139, 105, 20, 0.08);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(139, 105, 20, 0.2);
+}
+
+.total-label {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.label-text {
+  font-size: 28rpx;
+  color: #6b4a0a;
+  letter-spacing: 4rpx;
+}
+
+.label-seal {
+  width: 40rpx;
+  height: 40rpx;
+  background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(139, 0, 0, 0.3);
+}
+
+.seal-text {
+  font-size: 20rpx;
+  color: #ffd700;
+}
+
+.total-amount {
+  font-size: 72rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  display: block;
+  margin-bottom: 16rpx;
+  text-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.1);
+}
+
+.total-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.meta-item {
+  font-size: 26rpx;
+  color: #6b4a0a;
+}
+
+.meta-divider {
+  color: #6b4a0a;
+  opacity: 0.5;
+}
+
+// 区域标题
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx dashed rgba(107, 74, 10, 0.3);
+}
+
+.section-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  letter-spacing: 4rpx;
+}
+
+// 参与巫师
+.wizards-section {
+  padding: 24rpx 0;
+}
+
+.wizards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.wizard-card {
+  width: calc(33.33% - 12rpx);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16rpx;
+  padding: 20rpx 12rpx;
+  text-align: center;
+  border: 2rpx solid rgba(107, 74, 10, 0.15);
+  position: relative;
+  
+  &.is-payer {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: #8b6914;
+  }
+}
+
+.wizard-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  margin: 0 auto 12rpx;
+  border-radius: 50%;
+  overflow: visible;
+  border: 3rpx solid #8b6914;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.payer-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  font-size: 18rpx;
+  color: white;
+  background: #c41e3a;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+}
+
+.wizard-name {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  display: block;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wizard-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.detail-paid {
+  font-size: 22rpx;
+  color: #2e7d32;
+  background: rgba(46, 125, 50, 0.1);
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+}
+
+.detail-should {
+  font-size: 22rpx;
+  color: #6b4a0a;
+  opacity: 0.7;
+}
+
+// 清算契约（单账单）
+.contract-section {
+  padding: 24rpx 0;
+  border-top: 2rpx dashed rgba(107, 74, 10, 0.3);
+}
+
+.payer-contract {
+  background: rgba(139, 105, 20, 0.08);
+  border-radius: 12rpx;
+  padding: 20rpx;
+  text-align: center;
+}
+
+.contract-hint {
+  font-size: 28rpx;
+  color: #3a2a0a;
+}
+
+.payer-highlight {
+  color: #c41e3a;
+  font-weight: bold;
+}
+
+.contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.contract-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 20rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12rpx;
+  border-left: 6rpx solid;
+  
+  &.receive {
+    border-left-color: #2e7d32;
+    background: rgba(46, 125, 50, 0.08);
+  }
+  
+  &.pay {
+    border-left-color: #c62828;
+    background: rgba(198, 40, 40, 0.08);
+  }
+}
+
+.contract-wizard {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.contract-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  margin-left: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contract-action {
+  font-size: 26rpx;
+  color: #6b4a0a;
+  margin: 0 16rpx;
+  flex-shrink: 0;
+}
+
+.contract-amount {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  flex-shrink: 0;
+}
+
+// 结算方案（事件）
+.settlement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.settlement-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(107, 74, 10, 0.15);
+}
+
+.settlement-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140rpx;
+  
+  &.from {
+    align-items: flex-start;
+  }
+  
+  &.to {
+    align-items: flex-end;
+  }
+}
+
+.user-name {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #3a2a0a;
+  margin-top: 8rpx;
+  max-width: 120rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settlement-arrow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16rpx;
+}
+
+.arrow-amount {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #c41e3a;
+  margin-bottom: 4rpx;
+}
+
+.arrow-icon {
+  font-size: 32rpx;
+  color: #6b4a0a;
+}
+
+// 幽默台词横幅（放在最上面）
+.quote-banner {
+  background: linear-gradient(135deg, rgba($magic-gold, 0.15) 0%, rgba($magic-burgundy, 0.2) 100%);
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  
+  .quote-icon {
+    font-size: 40rpx;
+    flex-shrink: 0;
+  }
+  
+  .quote-text {
+    font-size: 28rpx;
+    color: rgba($parchment, 0.95);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+}
+
+// 简化清算契约样式（均分咒）
+.simple-contract {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.simple-contract-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: rgba($ink, 0.06);
+  border-radius: 12rpx;
+  
+  .contract-from, .contract-to {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    
+    .from-name, .to-name {
+      font-size: 26rpx;
+      color: $ink;
+      font-weight: 500;
+    }
+  }
+  
+  .contract-arrow {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    
+    .arrow-amount {
+      font-size: 26rpx;
+      font-weight: bold;
+      color: $magic-burgundy;
+    }
+    
+    .arrow-icon {
+      font-size: 28rpx;
+      color: rgba($magic-burgundy, 0.6);
+    }
+  }
+}
+
+// 底部
+.share-footer {
+  text-align: center;
+  padding: 32rpx 0;
+}
+
+.footer-text {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.4);
+  letter-spacing: 2rpx;
+}
+
+// 底部按钮栏
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: rgba($dark-purple, 0.95);
+  border-top: 2rpx solid rgba($magic-gold, 0.2);
+  display: flex;
+  gap: 24rpx;
+}
+
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, 
+    rgba($magic-gold, 0.9) 0%, 
+    rgba($magic-gold, 0.7) 100%
+  );
+  border: 2rpx solid rgba($ink, 0.3);
+  border-radius: 40rpx;
+  padding: 20rpx 32rpx;
+  box-shadow: 0 6rpx 20rpx rgba($magic-gold, 0.4);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+  
+  .btn-icon {
+    font-size: 32rpx;
+    margin-right: 12rpx;
+  }
+  
+  .btn-text {
+    font-size: 28rpx;
+    color: $ink;
+    font-weight: bold;
+  }
+}
+
+.start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, 
+    rgba($magic-burgundy, 0.95) 0%, 
+    rgba($magic-burgundy, 0.75) 100%
+  );
+  border: 2rpx solid rgba($magic-gold, 0.4);
+  border-radius: 40rpx;
+  padding: 20rpx 40rpx;
+  box-shadow: 0 6rpx 20rpx rgba($magic-burgundy, 0.4);
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  
+  // 顶部金色高光
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4rpx;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba($magic-gold, 0.4) 20%, 
+      rgba($magic-gold, 0.6) 50%, 
+      rgba($magic-gold, 0.4) 80%, 
+      transparent 100%
+    );
+  }
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.btn-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
+}
+
+.btn-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  letter-spacing: 2rpx;
+  white-space: nowrap;
+}
+
+// WizardAvatar 分享页专用尺寸
+.wizard-avatar .share-size,
+.share-size {
+  width: 72rpx !important;
+  height: 72rpx !important;
+}
+
+.wizard-avatar .small,
+.small {
+  width: 56rpx !important;
+  height: 56rpx !important;
+}
+
+.wizard-avatar .tiny,
+.tiny {
+  width: 44rpx !important;
+  height: 44rpx !important;
+}

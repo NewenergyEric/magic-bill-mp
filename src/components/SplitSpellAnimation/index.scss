@@ -1,0 +1,276 @@
+// 均分咒动画 - 金币分摊
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.split-spell-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(25, 25, 112, 0.95); // 深夜蓝
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+
+  // 背景光芒
+  .magic-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle,
+      rgba(201, 162, 39, 0.4) 0%,
+      rgba(201, 162, 39, 0.1) 30%,
+      transparent 60%
+    );
+    border-radius: 50%;
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  // 中心金币堆
+  .coin-pile {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pileAppear 0.5s ease-out;
+
+    .pile-glow {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle,
+        rgba(201, 162, 39, 0.6) 0%,
+        transparent 60%
+      );
+      border-radius: 50%;
+      animation: glowPulse 1s ease-in-out infinite;
+    }
+
+    .coin {
+      position: absolute;
+      width: var(--size, 30px);
+      height: var(--size, 30px);
+      background: linear-gradient(145deg, #ffd700, #c9a227);
+      border-radius: 50%;
+      box-shadow:
+        inset -2px -2px 4px rgba(0, 0, 0, 0.3),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+        0 0 10px rgba(201, 162, 39, 0.5);
+      animation: coinBounce 0.5s ease-out forwards;
+      animation-delay: var(--delay, 0s);
+
+      &::before {
+        content: 'G';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: calc(var(--size, 30px) * 0.5);
+        font-weight: bold;
+        color: #8b6914;
+      }
+    }
+  }
+
+  // 飞散的金币
+  .flying-coins {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+
+    .flying-coin {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--size, 20px);
+      height: var(--size, 20px);
+      margin: calc(var(--size, 20px) / -2) 0 0 calc(var(--size, 20px) / -2);
+      background: linear-gradient(145deg, #ffd700, #c9a227);
+      border-radius: 50%;
+      box-shadow:
+        inset -1px -1px 2px rgba(0, 0, 0, 0.3),
+        inset 1px 1px 2px rgba(255, 255, 255, 0.3),
+        0 0 8px rgba(201, 162, 39, 0.5);
+      animation: coinFly var(--duration, 1s) ease-out forwards;
+      animation-delay: var(--delay, 0s);
+
+      &::before {
+        content: 'G';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: calc(var(--size, 20px) * 0.4);
+        font-weight: bold;
+        color: #8b6914;
+      }
+    }
+  }
+
+  // 目标成员头像
+  .target-members {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 400px;
+    transform: translate(-50%, -50%);
+
+    .member-avatar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80px;
+      margin: -40px 0 0 -40px;
+      transform: rotate(var(--angle, 0deg)) translateX(180px) rotate(calc(-1 * var(--angle, 0deg)));
+      opacity: 0;
+      animation: memberAppear 0.5s ease-out forwards;
+      animation-delay: var(--delay, 0.8s);
+
+      .avatar-placeholder {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(145deg, #f5e6c8, #e8d4a8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #c9a227;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+        .avatar-icon {
+          font-size: 30px;
+        }
+      }
+
+      .received-coin {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(145deg, #ffd700, #c9a227);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #8b6914;
+        animation: coinBounce 0.3s ease-out 1s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+        .coin-icon {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  // 金额显示
+  .amount-display {
+    position: absolute;
+    bottom: 25%;
+    text-align: center;
+    animation: fadeInUp 0.5s ease-out 1.2s forwards;
+    opacity: 0;
+
+    .split-label {
+      font-size: 18px;
+      color: rgba(245, 230, 200, 0.8);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .split-amount {
+      font-size: 48px;
+      font-weight: bold;
+      color: #c9a227;
+      text-shadow: 0 0 20px rgba(201, 162, 39, 0.8);
+    }
+  }
+
+  // 咒语文字
+  .spell-text {
+    position: absolute;
+    bottom: 15%;
+    animation: fadeInUp 0.5s ease-out 1.4s forwards;
+    opacity: 0;
+
+    .spell-word {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f5e6c8;
+      text-shadow: 0 0 15px rgba(201, 162, 39, 0.6);
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+@keyframes pileAppear {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes coinBounce {
+  0% { transform: translateY(-30px); opacity: 0; }
+  60% { transform: translateY(5px); }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes coinFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--end-x), var(--end-y)) scale(0.5);
+    opacity: 0.8;
+  }
+}
+
+@keyframes memberAppear {
+  0% {
+    transform: rotate(var(--angle)) translateX(0) rotate(calc(-1 * var(--angle)));
+    opacity: 0;
+    scale: 0;
+  }
+  100% {
+    transform: rotate(var(--angle)) translateX(180px) rotate(calc(-1 * var(--angle)));
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

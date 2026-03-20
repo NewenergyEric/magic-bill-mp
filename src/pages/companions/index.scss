@@ -1,0 +1,640 @@
+// 休息室页面样式
+
+$magic-gold: #d4af37;
+$magic-burgundy: #740001;
+$parchment: #f4e4bc;
+$ink: #2c1e1a;
+
+.companions-page {
+  min-height: 100vh;
+  padding: 24rpx;
+  padding-bottom: 140rpx;
+  background: #1a0f0a;
+}
+
+// Header
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 0;
+  margin-bottom: 24rpx;
+  position: relative;
+}
+
+.help-btn {
+  position: absolute;
+  left: 0;
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 50%;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  
+  &:active {
+    background: rgba($magic-gold, 0.2);
+  }
+}
+
+.help-icon {
+  font-size: 32rpx;
+  color: $magic-gold;
+}
+
+.header-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.header-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+.login-btn {
+  padding: 8rpx 20rpx;
+  background: rgba($magic-gold, 0.1);
+  border: 2rpx solid $magic-gold;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .login-text {
+    font-size: 24rpx;
+    color: $magic-gold;
+    font-weight: bold;
+  }
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 6rpx 16rpx 6rpx 6rpx;
+  background: rgba($parchment, 0.1);
+  border-radius: 30rpx;
+  
+  .logout-text {
+    font-size: 24rpx;
+    color: rgba($parchment, 0.8);
+  }
+}
+
+// 提示卡片
+.tips-card {
+  background: rgba($magic-gold, 0.1);
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.2);
+}
+
+.tips-text {
+  font-size: 28rpx;
+  color: rgba($parchment, 0.8);
+}
+
+// 添加按钮
+.add-companion-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx;
+  background: linear-gradient(180deg, 
+    rgba($magic-burgundy, 0.95) 0%, 
+    rgba($magic-burgundy, 0.75) 100%
+  );
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid rgba($magic-gold, 0.4);
+  box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.3);
+  position: relative;
+  overflow: hidden;
+  
+  // 顶部金色高光
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3rpx;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba($magic-gold, 0.4) 20%, 
+      rgba($magic-gold, 0.6) 50%, 
+      rgba($magic-gold, 0.4) 80%, 
+      transparent 100%
+    );
+  }
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.add-icon {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+// 添加表单
+.add-form {
+  background: $parchment;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.form-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $ink;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.form-section {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: rgba($ink, 0.6);
+  margin-bottom: 12rpx;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+// 头像选择网格
+.avatar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+
+.avatar-option {
+  padding: 8rpx;
+  border-radius: 50%;
+  border: 4rpx solid transparent;
+  
+  &.selected {
+    border-color: $magic-burgundy;
+    background: rgba($magic-burgundy, 0.1);
+  }
+  
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.name-input {
+  width: 100%;
+  font-size: 32rpx;
+  padding: 28rpx 24rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12rpx;
+  border: 2rpx solid rgba($ink, 0.1);
+  box-sizing: border-box;
+  min-height: 88rpx;
+  line-height: 1.4;
+  
+  &::placeholder {
+    font-size: 30rpx;
+    color: rgba($ink, 0.4);
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 32rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid rgba($ink, 0.1);
+}
+
+.cancel-btn {
+  font-size: 30rpx;
+  color: rgba($ink, 0.5);
+  padding: 16rpx 32rpx;
+  
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.confirm-btn {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  background: linear-gradient(180deg, 
+    rgba($magic-burgundy, 0.95) 0%, 
+    rgba($magic-burgundy, 0.75) 100%
+  );
+  padding: 16rpx 32rpx;
+  border-radius: 12rpx;
+  border: 2rpx solid rgba($magic-gold, 0.4);
+  box-shadow: 0 4rpx 12rpx rgba($magic-burgundy, 0.3);
+  position: relative;
+  overflow: hidden;
+  
+  // 顶部金色高光
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3rpx;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba($magic-gold, 0.4) 20%, 
+      rgba($magic-gold, 0.6) 50%, 
+      rgba($magic-gold, 0.4) 80%, 
+      transparent 100%
+    );
+  }
+  
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+// 伙伴列表
+.companions-list {
+  margin-top: 16rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  background: $parchment;
+  border-radius: 16rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: $ink;
+  font-style: italic;
+}
+
+.companion-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: $parchment;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+  
+  &:active {
+    opacity: 0.9;
+  }
+  
+  &.is-self {
+    border: 2rpx solid $magic-gold;
+    background: rgba($magic-gold, 0.05);
+  }
+  
+  &.disabled {
+    opacity: 0.5;
+  }
+}
+
+.companion-index {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: rgba($magic-gold, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.index-num {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+.avatar-placeholder {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba($ink, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.companion-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 8rpx;
+  min-height: 72rpx;
+
+  &:active {
+    background: rgba($ink, 0.05);
+  }
+}
+
+.companion-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $ink;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280rpx;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.self-badge {
+  font-size: 22rpx;
+  color: $magic-gold;
+  background: rgba($magic-gold, 0.15);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.tips-hint {
+  display: block;
+  font-size: 24rpx;
+  color: $parchment;
+  margin-top: 12rpx;
+  font-weight: 500;
+}
+
+.delete-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba($magic-burgundy, 0.1);
+  
+  &:active {
+    background: rgba($magic-burgundy, 0.2);
+  }
+}
+
+.delete-icon {
+  font-size: 28rpx;
+  color: $magic-burgundy;
+}
+
+// 编辑头像提示
+.edit-avatar-hint {
+  position: absolute;
+  bottom: -8rpx;
+  right: -8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba($magic-gold, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.companion-avatar {
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  
+  &:active .edit-avatar-hint {
+    opacity: 1;
+  }
+}
+
+.hint-icon {
+  font-size: 18rpx;
+}
+
+// 编辑头像弹窗
+.edit-avatar-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 48rpx;
+}
+
+.edit-avatar-content {
+  width: 100%;
+  max-width: 600rpx;
+  background: linear-gradient(135deg, #2c1e1a 0%, #1a0f0a 100%);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 24rpx;
+  padding: 32rpx;
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.edit-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-gold;
+}
+
+.edit-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($parchment, 0.1);
+  border-radius: 50%;
+  
+  &:active {
+    background: rgba($parchment, 0.2);
+  }
+}
+
+.edit-name {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 24rpx;
+  padding: 16rpx;
+  background: rgba($parchment, 0.05);
+  border-radius: 12rpx;
+}
+
+.name-label {
+  font-size: 28rpx;
+  color: rgba($parchment, 0.6);
+  flex-shrink: 0;
+}
+
+.name-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: $parchment;
+}
+
+// 头像弹窗中的名字行
+.edit-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+  padding: 16rpx;
+  background: rgba($parchment, 0.08);
+  border-radius: 12rpx;
+  border: 2rpx solid rgba($magic-gold, 0.2);
+}
+
+.name-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $parchment;
+  flex: 1;
+}
+
+.name-input-inline {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: $parchment;
+  background: transparent;
+  padding: 8rpx 0;
+  border-bottom: 2rpx solid rgba($magic-gold, 0.4);
+
+  &::placeholder {
+    color: rgba($parchment, 0.4);
+    font-weight: normal;
+  }
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24rpx;
+  margin-top: 24rpx;
+}
+
+.edit-cancel {
+  font-size: 28rpx;
+  color: rgba($parchment, 0.6);
+  padding: 16rpx 32rpx;
+  
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.edit-confirm {
+  font-size: 28rpx;
+  color: $magic-gold;
+  font-weight: bold;
+  padding: 16rpx 32rpx;
+  background: rgba($magic-gold, 0.15);
+  border-radius: 12rpx;
+
+  &:active {
+    background: rgba($magic-gold, 0.25);
+  }
+}
+
+// 编辑名字弹窗
+.edit-name-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 48rpx;
+}
+
+.edit-name-content {
+  width: 100%;
+  max-width: 600rpx;
+  background: linear-gradient(135deg, #2c1e1a 0%, #1a0f0a 100%);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 24rpx;
+  padding: 32rpx;
+}
+
+.edit-name-form {
+  margin-bottom: 24rpx;
+
+  .form-label {
+    display: block;
+    font-size: 28rpx;
+    color: rgba($parchment, 0.7);
+    margin-bottom: 12rpx;
+  }
+
+  .name-input {
+    width: 100%;
+    font-size: 32rpx;
+    padding: 24rpx;
+    background: rgba($parchment, 0.1);
+    border: 2rpx solid rgba($magic-gold, 0.3);
+    border-radius: 12rpx;
+    color: $parchment;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: rgba($parchment, 0.4);
+    }
+  }
+}
+
+// 伙伴名字点击提示
+.edit-name-hint {
+  font-size: 22rpx;
+  color: rgba($ink, 0.4);
+  margin-top: 4rpx;
+
+  &:active {
+    color: rgba($ink, 0.6);
+  }
+}
