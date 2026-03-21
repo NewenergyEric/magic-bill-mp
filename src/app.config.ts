@@ -33,10 +33,6 @@ export default defineAppConfig({
         text: '古灵阁'
       },
       {
-        pagePath: 'pages/contract/index',
-        text: '契约'
-      },
-      {
         pagePath: 'pages/companions/index',
         text: '休息室'
       },

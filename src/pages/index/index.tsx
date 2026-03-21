@@ -1546,28 +1546,15 @@ export default function Index() {
       {showCompanionPicker && (
         <View className='modal-mask' onClick={() => {
           setShowCompanionPicker(false)
-          // 如果是快速添加模式，关闭时重置状态
-          if (isQuickAddMode) {
-            setIsQuickAddMode(false)
-            setQuickAddTargetCount(0)
-            setSelectedCompanionIds([])
-          }
         }}>
           <View className='companion-picker' onClick={(e) => e.stopPropagation()}>
             <View className='picker-header'>
               <Text className='picker-title'>
-                {isQuickAddMode 
-                  ? `选择伙伴 (已选 ${selectedCompanionIds.length}/${quickAddTargetCount} 位)` 
-                  : `选择伙伴 (已选 ${selectedCompanionIds.length} 位)`}
+                {`选择伙伴 (已选 ${selectedCompanionIds.length} 位)`}
               </Text>
               <View className='picker-close' onClick={() => {
                 setSelectedCompanionIds([])
                 setShowCompanionPicker(false)
-                // 如果是快速添加模式，关闭时重置状态
-                if (isQuickAddMode) {
-                  setIsQuickAddMode(false)
-                  setQuickAddTargetCount(0)
-                }
               }}>
                 <Text className='close-icon'>✕</Text>
               </View>
@@ -1738,11 +1725,7 @@ export default function Index() {
                 </View>
                 <View className='picker-footer'>
                   <Button className='confirm-add-btn' onClick={confirmAddCompanions}>
-                    {isQuickAddMode 
-                      ? (selectedCompanionIds.length > 0 
-                          ? `确认 (${selectedCompanionIds.length}位伙伴 + ${quickAddTargetCount - selectedCompanionIds.length}位随机)` 
-                          : `全部随机添加 ${quickAddTargetCount} 位`)
-                      : `确认添加 ${selectedCompanionIds.length} 位伙伴`}
+                    {`确认添加 ${selectedCompanionIds.length} 位伙伴`}
                   </Button>
                 </View>
               </>
