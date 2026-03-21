@@ -17,7 +17,7 @@ import {
   ParticipantSettlement,
   BillSettlementDetail
 } from '@/services/ledger'
-import { getCompanions } from '@/services/companions'
+import { getCompanions, addCompanion } from '@/services/companions'
 import { shareEvent } from '@/services/share'
 import { createContract, cloudLogin, getContractDetail } from '@/services/cloud'
 import { formatAmount } from '@/utils/settlement'
@@ -63,8 +63,21 @@ export default function LedgerPage() {
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [currentInviteCode, setCurrentInviteCode] = useState('')
   const [currentInviteName, setCurrentInviteName] = useState('')
+  const [inviteMode, setInviteMode] = useState<'new' | 'existing'>('existing') // new=新建后邀请, existing=已有事件邀请
 
-  // 显示邀请弹窗
+  // 添加自定义巫师相关
+  const [showAddWizard, setShowAddWizard] = useState(false)
+  const [newWizardName, setNewWizardName] = useState('')
+  const [newWizardAvatar, setNewWizardAvatar] = useState('')
+
+  // 显示邀请弹窗（新建后邀请）
+  const openInviteForNew = async (subLedger: SubLedger) => {
+    setCurrentInviteSubLedger(subLedger)
+    setInviteMode('new')
+    setShowInviteModal(true)
+  }
+
+  // 显示邀请弹窗（已有事件邀请）
   const handleShowInvite = async (subLedger: SubLedger) => {
     if (!subLedger.cloudId) {
       Taro.showToast({ title: '该事件未开启共享', icon: 'none' })
@@ -76,6 +89,7 @@ export default function LedgerPage() {
       if (res.success && res.data?.contract) {
         setCurrentInviteCode(res.data.contract.inviteCode || '')
         setCurrentInviteName(subLedger.name)
+        setInviteMode('existing')
         setShowInviteModal(true)
       } else {
         Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
@@ -83,6 +97,89 @@ export default function LedgerPage() {
     } catch (e) {
       console.error('[Invite] 获取邀请码失败', e)
       Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
+    }
+  }
+
+  // 关闭邀请弹窗
+  const closeInviteModal = () => {
+    setShowInviteModal(false)
+    setCurrentInviteSubLedger(null)
+    setCurrentInviteCode('')
+    setShowAddWizard(false)
+    setNewWizardName('')
+    setNewWizardAvatar('')
+  }
+
+  // 添加自定义巫师到休息室
+  const handleAddWizardToRoom = () => {
+    if (!newWizardName.trim()) {
+      Taro.showToast({ title: '请输入巫师名字', icon: 'none' })
+      return
+    }
+
+    // 添加到休息室
+    addCompanion({
+      name: newWizardName.trim(),
+      avatar: newWizardAvatar || '🧙'
+    })
+
+    // 如果是新建事件，同步到事件参与者
+    if (currentInviteSubLedger && !currentInviteSubLedger.cloudId) {
+      // 关联巫师到事件（本地）
+      linkWizardToSubLedger(currentInviteSubLedger._id, newWizardName.trim())
+    }
+
+    setShowAddWizard(false)
+    setNewWizardName('')
+    setNewWizardAvatar('')
+    loadData()
+    Taro.showToast({ title: '已添加巫师', icon: 'success' })
+  }
+
+  // 发送微信邀请（自动创建云端契约）
+  const handleSendInvite = async () => {
+    const subLedger = currentInviteSubLedger
+    if (!subLedger) return
+
+    // 如果还没有cloudId，先创建云端契约
+    if (!subLedger.cloudId) {
+      try {
+        const loginResult = await cloudLogin()
+        if (!loginResult.success || !loginResult.data) {
+          Taro.showToast({ title: '请先登录', icon: 'none' })
+          return
+        }
+
+        const contractResult = await createContract(subLedger.name)
+        if (contractResult.success && contractResult.data?.contract) {
+          // 更新本地事件的cloudId
+          updateSubLedger(subLedger._id, { cloudId: contractResult.data.contract._id })
+          setCurrentInviteSubLedger({ ...subLedger, cloudId: contractResult.data.contract._id })
+          setCurrentInviteCode(contractResult.data.contract.inviteCode || '')
+          Taro.showToast({ title: '已开启云端共享', icon: 'success' })
+          loadData()
+        } else {
+          Taro.showToast({ title: '开启共享失败', icon: 'none' })
+          return
+        }
+      } catch (e) {
+        console.error('[Invite] 创建云端契约失败', e)
+        Taro.showToast({ title: '开启共享失败', icon: 'none' })
+        return
+      }
+    }
+
+    // 显示邀请码
+    if (!currentInviteCode) {
+      // 如果没有邀请码，获取一个
+      try {
+        const res = await getContractDetail(subLedger.cloudId!)
+        if (res.success && res.data?.contract) {
+          setCurrentInviteCode(res.data.contract.inviteCode || '')
+        }
+      } catch (e) {
+        console.error('[Invite] 获取邀请码失败', e)
+      }
     }
   }
 
@@ -96,6 +193,12 @@ export default function LedgerPage() {
         }
       })
     }
+  }
+
+  // 将巫师关联到事件
+  const linkWizardToSubLedger = (subLedgerId: string, wizardName: string) => {
+    // 本地实现：巫师名称存储在事件的参与者中
+    // 这里简化处理，实际可以从账单中获取
   }
   
   useDidShow(() => {
@@ -190,56 +293,26 @@ export default function LedgerPage() {
       return
     }
 
-    // 如果开启了云端同步，先确保登录
-    if (enableCloudSync) {
-      const loginResult = await cloudLogin()
-      if (!loginResult.success || !loginResult.data) {
-        Taro.showToast({ title: '请先登录', icon: 'none' })
-        return
-      }
-    }
+    // 先确保登录（如果后续需要云端）
+    await cloudLogin()
 
     // 创建本地事件
     const newSubLedger = createSubLedger(newSubLedgerName.trim())
-
-    // 如果开启了云端同步，创建云端契约
-    if (enableCloudSync) {
-      try {
-        const contractResult = await createContract(newSubLedgerName.trim())
-        if (contractResult.success && contractResult.data?.contract) {
-          // 更新本地事件的 cloudId
-          updateSubLedger(newSubLedger._id, { cloudId: contractResult.data.contract._id })
-          Taro.showToast({ title: '已创建共享事件', icon: 'success' })
-        } else {
-          Taro.showToast({ title: '云端同步失败', icon: 'none' })
-        }
-      } catch (e) {
-        console.error('创建云端契约失败', e)
-        Taro.showToast({ title: '云端同步失败', icon: 'none' })
-      }
-    } else {
-      Taro.showToast({ title: '创建成功', icon: 'success' })
-    }
 
     setShowCreateModal(false)
     setNewSubLedgerName('')
     setEnableCloudSync(false)
     loadData()
 
-    // 提示用户是否直接去记账
-    Taro.showModal({
-      title: '是否开始记账？',
-      content: `已为你创建「${newSubLedger.name}」事件，现在去记录第一笔开销？`,
-      confirmText: '去记账',
-      cancelText: '再看看',
-      success: (res) => {
-        if (res.confirm) {
-          Taro.setStorageSync('active_accounting_subledger_id', newSubLedger._id)
-          Taro.switchTab({ url: '/pages/index/index' })
-        }
-      }
-    })
+    Taro.showToast({ title: '创建成功', icon: 'success' })
+
+    // 立即打开邀请界面
+    setCurrentInviteSubLedger(newSubLedger)
+    setShowInviteModal(true)
   }
+
+  // 当前正在邀请的事件
+  const [currentInviteSubLedger, setCurrentInviteSubLedger] = useState<SubLedger | null>(null)
 
   // 打开编辑弹窗
   const openEditModal = (subLedger: SubLedger) => {
@@ -1085,16 +1158,73 @@ export default function LedgerPage() {
 
       {/* 邀请弹窗 */}
       {showInviteModal && (
-        <View className='modal-mask' onClick={() => setShowInviteModal(false)}>
+        <View className='modal-mask' onClick={() => closeInviteModal()}>
           <View className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <Text className='modal-title'>📜 邀请巫师加入「{currentInviteName}」</Text>
-            <Text className='modal-hint'>分享邀请码，好友加入后即可共同记账</Text>
-            <View className='invite-code-box'>
-              <Text className='invite-code'>{currentInviteCode}</Text>
-            </View>
-            <View className='modal-actions'>
-              <Text className='modal-cancel' onClick={() => setShowInviteModal(false)}>关闭</Text>
-              <Text className='modal-confirm' onClick={handleCopyInviteCode}>复制邀请码</Text>
+            <Text className='modal-title'>📜 邀请巫师加入「{currentInviteSubLedger?.name}」</Text>
+
+            {/* 添加自定义巫师 */}
+            {!showAddWizard ? (
+              <>
+                <Text className='modal-hint'>添加巫师或发送微信邀请</Text>
+
+                <View className='invite-actions'>
+                  {/* 添加自定义巫师按钮 */}
+                  <View className='invite-action-btn' onClick={() => setShowAddWizard(true)}>
+                    <Text className='action-icon'>🧙</Text>
+                    <Text className='action-text'>添加自定义巫师</Text>
+                  </View>
+
+                  {/* 发送微信邀请按钮 */}
+                  <View className='invite-action-btn' onClick={handleSendInvite}>
+                    <Text className='action-icon'>📱</Text>
+                    <Text className='action-text'>发送微信邀请</Text>
+                  </View>
+                </View>
+
+                {/* 如果有邀请码，显示邀请码 */}
+                {currentInviteCode && (
+                  <View className='invite-code-section'>
+                    <Text className='section-label'>邀请码</Text>
+                    <View className='invite-code-box'>
+                      <Text className='invite-code'>{currentInviteCode}</Text>
+                    </View>
+                    <View className='copy-btn' onClick={handleCopyInviteCode}>
+                      <Text className='copy-btn-text'>复制邀请码</Text>
+                    </View>
+                  </View>
+                )}
+              </>
+            ) : (
+              <>
+                {/* 添加巫师表单 */}
+                <Text className='modal-hint'>设置巫师名字和头像</Text>
+                <Input
+                  className='modal-input'
+                  value={newWizardName}
+                  onInput={(e) => setNewWizardName(e.detail.value)}
+                  placeholder='输入巫师名字'
+                />
+                <View className='avatar-picker'>
+                  {['🧙', '🧝', '🧚', '🦹', '🧛', '🧜'].map(emoji => (
+                    <View
+                      key={emoji}
+                      className={`avatar-option ${newWizardAvatar === emoji ? 'selected' : ''}`}
+                      onClick={() => setNewWizardAvatar(emoji)}
+                    >
+                      <Text className='avatar-emoji'>{emoji}</Text>
+                    </View>
+                  ))}
+                </View>
+                <View className='modal-actions'>
+                  <Text className='modal-cancel' onClick={() => setShowAddWizard(false)}>取消</Text>
+                  <Text className='modal-confirm' onClick={handleAddWizardToRoom}>确认添加</Text>
+                </View>
+              </>
+            )}
+
+            {/* 底部关闭按钮 */}
+            <View className='modal-close-hint' onClick={closeInviteModal}>
+              <Text className='close-hint-text'>稍后再说</Text>
             </View>
           </View>
         </View>

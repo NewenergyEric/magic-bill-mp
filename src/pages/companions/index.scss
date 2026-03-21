@@ -638,3 +638,48 @@ $ink: #2c1e1a;
     color: rgba($ink, 0.6);
   }
 }
+
+// 伙伴操作按钮组
+.companion-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+// 邀请按钮
+.invite-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba($magic-gold, 0.15);
+  border-radius: 50%;
+  border: 2rpx solid rgba($magic-gold, 0.3);
+
+  &:active {
+    background: rgba($magic-gold, 0.25);
+  }
+}
+
+.invite-icon {
+  font-size: 28rpx;
+}
+
+// 邀请码框
+.invite-code-box {
+  background: rgba($magic-gold, 0.1);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 30rpx 0;
+  text-align: center;
+}
+
+.invite-code {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  letter-spacing: 8rpx;
+}
+}

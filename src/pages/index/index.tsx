@@ -2,7 +2,7 @@ import { View, Text, Image, Input, Button } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import homeBg from '@/assets/home-bg.png'
-import { getCompanions, WizardCompanion, canSelectCompanion, addOrUpdateCompanion } from '@/services/companions'
+import { getCompanions, WizardCompanion, canSelectCompanion, addOrUpdateCompanion, addCompanion } from '@/services/companions'
 import { WIZARDS } from '@/constants/wizards'
 import { Bill, Participant, Settlement, SubLedger } from '@/types'
 import {
@@ -14,7 +14,7 @@ import {
 } from '@/services/ledger'
 import { shareBill } from '@/services/share'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
-import { cloudLogin, getContractDetail, getBillsByContract, createCloudBill, getMyContracts } from '@/services/cloud'
+import { cloudLogin, getContractDetail, getBillsByContract, createCloudBill, getMyContracts, createContract } from '@/services/cloud'
 import { addExpAndCheckAchievements, getLevelBadge, getLevelTitle } from '@/services/wizard'
 import WizardAvatar from '@/components/WizardAvatar'
 import NewbieGuide, { shouldShowGuide } from '@/components/NewbieGuide'
@@ -178,6 +178,88 @@ export default function Index() {
   // 显示邀请巫师弹窗
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [inviteCode, setInviteCode] = useState('')
+  const [showAddWizardForm, setShowAddWizardForm] = useState(false)
+  const [inviteWizardName, setInviteWizardName] = useState('')
+  const [inviteWizardAvatar, setInviteWizardAvatar] = useState('')
+
+  // 添加自定义巫师（直接添加到巫师列表）
+  const handleAddWizardDirect = () => {
+    if (!inviteWizardName.trim()) {
+      Taro.showToast({ title: '请输入巫师名字', icon: 'none' })
+      return
+    }
+
+    const newWizard: Participant = {
+      id: Date.now().toString(),
+      name: inviteWizardName.trim(),
+      avatar: inviteWizardAvatar || '🧙',
+      paid: 0
+    }
+
+    if (activeTab === 'simple') {
+      setWizards([...wizards, newWizard])
+    } else {
+      setMultiWizards([...multiWizards, newWizard])
+    }
+
+    // 添加到休息室
+    addCompanion({
+      name: inviteWizardName.trim(),
+      avatar: inviteWizardAvatar || '🧙'
+    })
+
+    setShowAddWizardForm(false)
+    setInviteWizardName('')
+    setInviteWizardAvatar('')
+    Taro.showToast({ title: '已添加巫师', icon: 'success' })
+  }
+
+  // 施咒页面发送邀请
+  const handleSendInviteForSpell = async () => {
+    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
+    if (!currentSubLedger) return
+
+    // 如果还没有cloudId，先创建云端契约
+    if (!currentSubLedger.cloudId) {
+      try {
+        const loginResult = await cloudLogin(
+          userCompanion?.name || '神秘巫师',
+          userCompanion?.avatar || ''
+        )
+        if (!loginResult.success || !loginResult.data) {
+          Taro.showToast({ title: '请先登录', icon: 'none' })
+          return
+        }
+
+        const contractResult = await createContract(currentSubLedger.name)
+        if (contractResult.success && contractResult.data?.contract) {
+          // 更新本地事件的cloudId
+          const { updateSubLedger } = require('@/services/ledger')
+          updateSubLedger(currentSubLedger._id, { cloudId: contractResult.data.contract._id })
+          setInviteCode(contractResult.data.contract.inviteCode || '')
+          setSubLedgers(getActiveSubLedgers())
+          Taro.showToast({ title: '已开启云端共享', icon: 'success' })
+        } else {
+          Taro.showToast({ title: '开启共享失败', icon: 'none' })
+          return
+        }
+      } catch (e) {
+        console.error('[Invite] 创建云端契约失败', e)
+        Taro.showToast({ title: '开启共享失败', icon: 'none' })
+        return
+      }
+    } else {
+      // 已有cloudId，获取邀请码
+      try {
+        const res = await getContractDetail(currentSubLedger.cloudId)
+        if (res.success && res.data?.contract) {
+          setInviteCode(res.data.contract.inviteCode || '')
+        }
+      } catch (e) {
+        console.error('[Invite] 获取邀请码失败', e)
+      }
+    }
+  }
 
   // 加入契约相关
   const [showJoinModal, setShowJoinModal] = useState(false)
@@ -1308,7 +1390,7 @@ export default function Index() {
                   className='name-input'
                   type='text'
                   value={newWizardName}
-                  onInput={(e) => setNewWizardName(e.detail.value)}
+                  onInput={(e) => setInviteWizardName(e.detail.value)}
                   placeholder='输入姓名'
                   autoFocus
                 />
@@ -1897,14 +1979,70 @@ export default function Index() {
       {showInviteModal && (
         <View className='modal-mask' onClick={() => setShowInviteModal(false)}>
           <View className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <Text className='modal-title'>📜 邀请巫师</Text>
-            <Text className='modal-hint'>分享邀请码，好友加入后即可共同记账</Text>
-            <View className='invite-code-box'>
-              <Text className='invite-code'>{inviteCode}</Text>
-            </View>
-            <View className='modal-actions'>
-              <View className='modal-cancel' onClick={(e) => { e.stopPropagation(); setShowInviteModal(false); }}>关闭</View>
-              <View className='modal-confirm' onClick={(e) => { e.stopPropagation(); handleCopyInviteCode(); }}>复制邀请码</View>
+            <Text className='modal-title'>📜 邀请巫师加入「{subLedgers.find(sl => sl._id === selectedSubLedgerId)?.name}」</Text>
+
+            {/* 添加自定义巫师表单 */}
+            {showAddWizardForm ? (
+              <>
+                <Text className='modal-hint'>设置巫师名字和头像</Text>
+                <Input
+                  className='modal-input'
+                  value={newWizardName}
+                  onInput={(e) => setInviteWizardName(e.detail.value)}
+                  placeholder='输入巫师名字'
+                />
+                <View className='avatar-picker'>
+                  {['🧙', '🧝', '🧚', '🦹', '🧛', '🧜'].map(emoji => (
+                    <View
+                      key={emoji}
+                      className={`avatar-option ${inviteWizardAvatar === emoji ? 'selected' : ''}`}
+                      onClick={() => setInviteWizardAvatar(emoji)}
+                    >
+                      <Text className='avatar-emoji'>{emoji}</Text>
+                    </View>
+                  ))}
+                </View>
+                <View className='modal-actions'>
+                  <Text className='modal-cancel' onClick={() => { setShowAddWizardForm(false); setInviteWizardName(''); setInviteWizardAvatar(''); }}>取消</Text>
+                  <Text className='modal-confirm' onClick={() => handleAddWizardDirect()}>确认添加</Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <Text className='modal-hint'>添加巫师或发送微信邀请</Text>
+
+                <View className='invite-actions'>
+                  {/* 添加自定义巫师按钮 */}
+                  <View className='invite-action-btn' onClick={() => setShowAddWizardForm(true)}>
+                    <Text className='action-icon'>🧙</Text>
+                    <Text className='action-text'>添加自定义巫师</Text>
+                  </View>
+
+                  {/* 发送微信邀请按钮 */}
+                  <View className='invite-action-btn' onClick={handleSendInviteForSpell}>
+                    <Text className='action-icon'>📱</Text>
+                    <Text className='action-text'>发送微信邀请</Text>
+                  </View>
+                </View>
+
+                {/* 如果有邀请码，显示邀请码 */}
+                {inviteCode && (
+                  <View className='invite-code-section'>
+                    <Text className='section-label'>邀请码</Text>
+                    <View className='invite-code-box'>
+                      <Text className='invite-code'>{inviteCode}</Text>
+                    </View>
+                    <View className='copy-btn' onClick={handleCopyInviteCode}>
+                      <Text className='copy-btn-text'>复制邀请码</Text>
+                    </View>
+                  </View>
+                )}
+              </>
+            )}
+
+            {/* 底部关闭按钮 */}
+            <View className='modal-close-hint' onClick={() => { setShowInviteModal(false); setShowAddWizardForm(false); setInviteWizardName(''); setInviteWizardAvatar(''); }}>
+              <Text className='close-hint-text'>关闭</Text>
             </View>
           </View>
         </View>

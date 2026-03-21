@@ -7,6 +7,7 @@ import { WIZARDS } from '@/constants/wizards'
 import WizardAvatar from '@/components/WizardAvatar'
 import NewbieGuide, { shouldShowGuide } from '@/components/NewbieGuide'
 import UserLogin from '@/components/UserLogin'
+import { cloudLogin, createContract } from '@/services/cloud'
 import './index.scss'
 
 export default function CompanionsPage() {
@@ -27,6 +28,64 @@ export default function CompanionsPage() {
   
   // 新手引导
   const [showGuide, setShowGuide] = useState(false)
+
+  // 邀请相关
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteCode, setInviteCode] = useState('')
+  const [invitingCompanion, setInvitingCompanion] = useState<WizardCompanion | null>(null)
+
+  // 显示邀请弹窗（升级自定义巫师为微信用户）
+  const handleShowInvite = async (companion: WizardCompanion) => {
+    if (!isLogged) {
+      Taro.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+
+    setInvitingCompanion(companion)
+
+    // 创建临时契约来获取邀请码
+    try {
+      const loginResult = await cloudLogin(
+        companion.name,
+        companion.avatar || ''
+      )
+      if (!loginResult.success || !loginResult.data) {
+        Taro.showToast({ title: '登录失败', icon: 'none' })
+        return
+      }
+
+      // 创建契约获取邀请码
+      const contractResult = await createContract(`邀请-${companion.name}`)
+      if (contractResult.success && contractResult.data?.contract) {
+        setInviteCode(contractResult.data.contract.inviteCode || '')
+        setShowInviteModal(true)
+      } else {
+        Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('[Invite] 邀请失败', e)
+      Taro.showToast({ title: '邀请失败', icon: 'none' })
+    }
+  }
+
+  // 复制邀请码
+  const handleCopyInviteCode = () => {
+    if (inviteCode) {
+      Taro.setClipboardData({
+        data: inviteCode,
+        success: () => {
+          Taro.showToast({ title: '邀请码已复制', icon: 'success' })
+        }
+      })
+    }
+  }
+
+  // 关闭邀请弹窗
+  const closeInviteModal = () => {
+    setShowInviteModal(false)
+    setInviteCode('')
+    setInvitingCompanion(null)
+  }
   
   useDidShow(() => {
     setCompanions(getCompanions())
@@ -258,11 +317,19 @@ export default function CompanionsPage() {
                   )}
                 </View>
                 {!companion.isSelf && (
-                  <View
-                    className='delete-btn'
-                    onClick={() => handleDelete(companion)}
-                  >
-                    <Text className='delete-icon'>✕</Text>
+                  <View className='companion-actions'>
+                    <View
+                      className='invite-btn'
+                      onClick={() => handleShowInvite(companion)}
+                    >
+                      <Text className='invite-icon'>📱</Text>
+                    </View>
+                    <View
+                      className='delete-btn'
+                      onClick={() => handleDelete(companion)}
+                    >
+                      <Text className='delete-icon'>✕</Text>
+                    </View>
                   </View>
                 )}
               </View>
@@ -369,10 +436,27 @@ export default function CompanionsPage() {
 
       {/* 新手引导 */}
       {showGuide && (
-        <NewbieGuide 
+        <NewbieGuide
           type='companion'
-          onComplete={() => setShowGuide(false)} 
+          onComplete={() => setShowGuide(false)}
         />
+      )}
+
+      {/* 邀请弹窗 */}
+      {showInviteModal && (
+        <View className='modal-mask' onClick={() => closeInviteModal()}>
+          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
+            <Text className='modal-title'>📱 邀请「{invitingCompanion?.name}」升级为微信用户</Text>
+            <Text className='modal-hint'>分享邀请码，好友加入后该巫师将变为微信用户</Text>
+            <View className='invite-code-box'>
+              <Text className='invite-code'>{inviteCode}</Text>
+            </View>
+            <View className='modal-actions'>
+              <Text className='modal-cancel' onClick={() => closeInviteModal()}>关闭</Text>
+              <Text className='modal-confirm' onClick={() => handleCopyInviteCode()}>复制邀请码</Text>
+            </View>
+          </View>
+        </View>
       )}
     </View>
   )
