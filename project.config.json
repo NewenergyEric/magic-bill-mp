@@ -33,8 +33,13 @@
     "enableEngineNative": false,
     "useIsolateContext": false,
     "userConfirmedBundleSwitch": false,
-    "packNpmManually": false,
-    "packNpmRelationList": [],
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./dist"
+      }
+    ],
     "minifyWXSS": true,
     "minifyWXML": true,
     "disableUseStrict": false,
