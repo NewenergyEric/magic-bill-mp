@@ -811,3 +811,66 @@
     opacity: 1;
   }
 }
+
+// 跳转到施咒按钮
+.go-to-cast-btn {
+  margin: 24rpx 32rpx;
+  padding: 28rpx;
+  background: linear-gradient(135deg, $magic-gold 0%, darken($magic-gold, 15%) 100%);
+  border-radius: 50rpx;
+  text-align: center;
+  box-shadow: 0 6rpx 20rpx rgba($magic-gold, 0.5);
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  .go-to-cast-btn-text {
+    font-size: 32rpx;
+    color: $ink;
+    font-weight: bold;
+  }
+}
+
+// 账单列表
+.bill-list {
+  padding: 0 32rpx;
+}
+
+.subledger-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+  border: 2rpx solid transparent;
+
+  &:active {
+    background: rgba($ink, 0.05);
+  }
+}
+
+.subledger-icon {
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.subledger-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.subledger-name {
+  font-size: 30rpx;
+  color: $ink;
+  font-weight: 500;
+}
+
+.subledger-amount {
+  font-size: 28rpx;
+  color: rgba($ink, 0.65);
+  margin-top: 4rpx;
+}

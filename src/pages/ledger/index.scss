@@ -1244,7 +1244,75 @@ $dark-purple: #1a0f0a;
   border-radius: 12rpx;
   color: $ink;
   box-sizing: border-box;
-  margin-bottom: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+// 云端同步开关
+.cloud-sync-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: rgba($magic-gold, 0.1);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.toggle-icon {
+  font-size: 40rpx;
+}
+
+.toggle-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle-title {
+  font-size: 30rpx;
+  color: $parchment;
+  font-weight: bold;
+}
+
+.toggle-desc {
+  font-size: 22rpx;
+  color: rgba($parchment, 0.6);
+  margin-top: 4rpx;
+}
+
+.toggle-switch {
+  width: 96rpx;
+  height: 52rpx;
+  background: rgba($parchment, 0.2);
+  border-radius: 26rpx;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &.active {
+    background: linear-gradient(135deg, $magic-gold 0%, lighten($magic-gold, 15%) 100%);
+
+    .toggle-knob {
+      left: 52rpx;
+    }
+  }
+}
+
+.toggle-knob {
+  width: 44rpx;
+  height: 44rpx;
+  background: $parchment;
+  border-radius: 50%;
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
 }
 
 .modal-actions {

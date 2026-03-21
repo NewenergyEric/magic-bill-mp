@@ -127,7 +127,7 @@ export function getArchivedSubLedgers(): SubLedger[] {
 /**
  * 创建子收支录
  */
-export function createSubLedger(name: string): SubLedger {
+export function createSubLedger(name: string, cloudId?: string): SubLedger {
   const subLedgers = getSubLedgers()
   const newSubLedger: SubLedger = {
     _id: Date.now().toString(),
@@ -135,7 +135,8 @@ export function createSubLedger(name: string): SubLedger {
     date: Date.now(),
     billIds: [],
     totalAmount: 0,
-    status: 'active'
+    status: 'active',
+    cloudId  // 云端契约ID（可选）
   }
   subLedgers.unshift(newSubLedger)
   Taro.setStorageSync(SUB_LEDGER_KEY, subLedgers)

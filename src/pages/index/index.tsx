@@ -14,7 +14,7 @@ import {
 } from '@/services/ledger'
 import { shareBill } from '@/services/share'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
-import { cloudLogin, getMyContracts, getContractDetail, createCloudBill } from '@/services/cloud'
+import { cloudLogin, getMyContracts, getContractDetail, getBillsByContract, createCloudBill } from '@/services/cloud'
 import { addExpAndCheckAchievements, getLevelBadge, getLevelTitle } from '@/services/wizard'
 import WizardAvatar from '@/components/WizardAvatar'
 import NewbieGuide, { shouldShowGuide } from '@/components/NewbieGuide'
@@ -64,11 +64,6 @@ export default function Index() {
   const [showCreateEvent, setShowCreateEvent] = useState(false)
   const [newEventName, setNewEventName] = useState('')
   
-  // 快速添加巫师数量
-  const [wizardCount, setWizardCount] = useState('')
-  const [showQuickAddModal, setShowQuickAddModal] = useState(false)
-  const [quickAddTargetCount, setQuickAddTargetCount] = useState(0) // 快速添加的目标数量
-  const [isQuickAddMode, setIsQuickAddMode] = useState(false) // 是否处于快速添加模式
   
   // 均分咒：添加巫师
   const [showSimpleAddForm, setShowSimpleAddForm] = useState(false)
@@ -83,7 +78,7 @@ export default function Index() {
   const [newWizardName, setNewWizardName] = useState('')
 
   // ========== 契约相关状态 ==========
-  const [contracts, setContracts] = useState<Array<{ contractId: string; name: string; memberCount: number }>>([])
+  const [contracts, setContracts] = useState<Array<{ _id: string; name: string; memberCount?: number; members?: any[] }>>([])
   const [selectedContractId, setSelectedContractId] = useState<string>('')
   const [showContractPicker, setShowContractPicker] = useState(false)
 
@@ -91,8 +86,8 @@ export default function Index() {
   const loadContracts = async () => {
     try {
       const res = await getMyContracts()
-      if (res.success && res.data) {
-        setContracts(res.data)
+      if (res.success && res.data?.contracts) {
+        setContracts(res.data.contracts)
       }
     } catch (e) {
       console.log('[Contract] 获取契约列表失败', e)
@@ -101,7 +96,72 @@ export default function Index() {
 
   useEffect(() => {
     loadContracts()
+    // 检查是否有从契约页面跳转过来的契约ID和账单ID
+    const activeContractId = Taro.getStorageSync('active_contract_id')
+    const activeBillId = Taro.getStorageSync('active_bill_id')
+
+    if (activeContractId) {
+      // 清除存储
+      Taro.removeStorageSync('active_contract_id')
+      // 先设置契约ID
+      setSelectedContractId(activeContractId)
+      setShowContractPicker(false)
+
+      // 如果同时有账单ID，加载账单的参与者
+      if (activeBillId) {
+        Taro.removeStorageSync('active_bill_id')
+        // 延迟加载，确保契约ID已设置
+        setTimeout(() => {
+          loadBillParticipants(activeBillId, activeContractId)
+        }, 800)
+      }
+    } else if (activeBillId) {
+      // 只有账单ID的情况（理论上不应该发生）
+      Taro.removeStorageSync('active_bill_id')
+      loadBillParticipants(activeBillId, selectedContractId)
+    }
   }, [])
+
+  // 加载账单的参与者，继续记账
+  const loadBillParticipants = async (billId: string, contractId?: string) => {
+    const targetContractId = contractId || selectedContractId
+    if (!targetContractId) {
+      console.log('[Contract] contractId 为空，无法加载账单')
+      return
+    }
+
+    try {
+      console.log('[Contract] 加载账单参与者', { billId, targetContractId })
+      const res = await getBillsByContract(targetContractId)
+      console.log('[Contract] getBillsByContract 返回:', JSON.stringify(res))
+
+      if (res.success && res.data?.bills) {
+        const bill = res.data.bills.find((b: any) => b._id === billId)
+        console.log('[Contract] 找到账单:', JSON.stringify(bill))
+
+        if (bill && bill.participants && Array.isArray(bill.participants)) {
+          const participants = bill.participants.map((p: any) => ({
+            id: p.memberId || p.userId || '',
+            name: p.name || '巫师',
+            avatar: p.avatar || '',
+            paid: p.paid || 0
+          }))
+          console.log('[Contract] 转换后的参与者:', JSON.stringify(participants))
+
+          if (activeTab === 'simple') {
+            setWizards(participants)
+          } else {
+            setMultiWizards(participants)
+          }
+          Taro.showToast({ title: '已加载账单参与者', icon: 'none' })
+        } else {
+          console.log('[Contract] 账单没有参与者或参与者不是数组', bill?.participants)
+        }
+      }
+    } catch (e) {
+      console.log('[Contract] 加载账单参与者失败', e)
+    }
+  }
 
   // 选择契约后自动填充成员
   const handleSelectContract = async (contractId: string) => {
@@ -109,7 +169,7 @@ export default function Index() {
     setShowContractPicker(false)
 
     if (contractId && contracts.length > 0) {
-      const contract = contracts.find(c => c.contractId === contractId)
+      const contract = contracts.find(c => c._id === contractId)
       if (contract) {
         try {
           const res = await getContractDetail(contractId)
@@ -281,43 +341,9 @@ export default function Index() {
         paid: 0
       })
     }
-    
-    // 如果是快速添加模式（均分咒），需要补齐随机巫师
-    if (isQuickAddMode && quickAddTargetCount > 0) {
-      const companionCount = newWizards.length
-      const remainingCount = quickAddTargetCount - companionCount
-      
-      if (remainingCount > 0) {
-        const randomWizards = generateRandomWizards(remainingCount, wizards.length + companionCount)
-        const finalWizards = [...wizards, ...newWizards, ...randomWizards]
-        setWizards(finalWizards)
-        // 均分咒：如果没有设置付款人，默认第一个巫师为付款人
-        if (!payerId && finalWizards.length > 0) {
-          setPayerId(finalWizards[0].id)
-        }
-        // 同步随机巫师到伙伴列表
-        randomWizards.forEach(w => {
-          addOrUpdateCompanion(w.name, w.avatar)
-        })
-        setCompanions(getCompanions())
-        Taro.showToast({ 
-          title: companionCount > 0 
-            ? `已添加${companionCount}位伙伴+${remainingCount}位随机巫师` 
-            : `已添加${remainingCount}位随机巫师`, 
-          icon: 'success' 
-        })
-      } else {
-        const finalWizards = [...wizards, ...newWizards]
-        setWizards(finalWizards)
-        if (!payerId && finalWizards.length > 0) {
-          setPayerId(finalWizards[0].id)
-        }
-        Taro.showToast({ title: `已添加${companionCount}位伙伴`, icon: 'success' })
-      }
-      
-      setIsQuickAddMode(false)
-      setQuickAddTargetCount(0)
-    } else if (activeTab === 'multi') {
+
+    // 添加伙伴
+    if (activeTab === 'multi') {
       // 清算咒模式：添加到 multiWizards
       const existing = multiWizards.find(w => w.id === newWizards[0]?.id)
       if (!existing && newWizards.length > 0) {
@@ -339,32 +365,6 @@ export default function Index() {
     
     setSelectedCompanionIds([])
     setShowCompanionPicker(false)
-  }
-
-  // 添加随机巫师（均分咒）
-  const addRandomWizard = () => {
-    if (wizards.length >= 30) {
-      Taro.showToast({ title: '最多30位巫师', icon: 'none' })
-      return
-    }
-    const avatar = getRandomAvatar()
-    const wizard = WIZARDS.find(w => w.avatar === avatar)!
-    const newWizard = {
-      id: Date.now().toString(),
-      name: wizard.name,
-      avatar,
-      paid: 0
-    }
-    const finalWizards = [...wizards, newWizard]
-    setWizards(finalWizards)
-    // 均分咒：如果这是第一个巫师，自动设为付款人
-    if (wizards.length === 0) {
-      setPayerId(newWizard.id)
-    }
-    // 同步到伙伴列表
-    addOrUpdateCompanion(wizard.name, avatar)
-    // 刷新伙伴列表状态
-    setCompanions(getCompanions())
   }
 
   // 移除巫师
@@ -431,7 +431,7 @@ export default function Index() {
     // 如果选择了契约，同时创建云端账单
     if (selectedContractId && contracts.length > 0) {
       try {
-        const contract = contracts.find(c => c.contractId === selectedContractId)
+        const contract = contracts.find(c => c._id === selectedContractId)
         if (contract) {
           // 构建云端账单参与者
           const cloudParticipants = participantsWithPaid.map(w => ({
@@ -764,84 +764,6 @@ export default function Index() {
     Taro.navigateTo({
       url: `/pages/share/index?type=bill&id=${shareInfo.path.split('id=')[1]}`
     })
-  }
-
-  // 快速添加巫师数量
-  const openQuickAddModal = () => {
-    setWizardCount('')
-    setShowQuickAddModal(true)
-  }
-
-  // 确认快速添加
-  const confirmQuickAdd = () => {
-    const count = parseInt(wizardCount)
-    if (isNaN(count) || count <= 0) {
-      Taro.showToast({ title: '请输入有效数量', icon: 'none' })
-      return
-    }
-    if (wizards.length + count > 30) {
-      Taro.showToast({ title: '最多30位巫师', icon: 'none' })
-      return
-    }
-    
-    // 关闭数量输入弹窗
-    setShowQuickAddModal(false)
-    
-    // 如果有伙伴，打开伙伴选择器让用户选择
-    if (companions.length > 0) {
-      // 设置快速添加模式
-      setIsQuickAddMode(true)
-      setQuickAddTargetCount(count)
-      setSelectedCompanionIds([])
-      setShowCompanionPicker(true)
-    } else {
-      // 没有伙伴，直接随机添加
-      addRandomWizards(count)
-    }
-  }
-
-  // 生成随机巫师（辅助函数）
-  const generateRandomWizards = (count: number, currentCount: number): Participant[] => {
-    const newWizards: Participant[] = []
-    const usedAvatars = wizards.map(w => w.avatar)
-    let available = WIZARDS.filter(w => !usedAvatars.includes(w.avatar))
-    
-    for (let i = 0; i < count; i++) {
-      if (available.length === 0) {
-        // 如果所有头像都用完了，重新开始
-        available = [...WIZARDS]
-      }
-      const randomIndex = Math.floor(Math.random() * available.length)
-      const wizard = available[randomIndex]
-      newWizards.push({
-        id: Date.now().toString() + currentCount + i,
-        name: wizard.name,
-        avatar: wizard.avatar,
-        paid: 0
-      })
-      // 移除已使用的
-      available = available.filter(w => w.avatar !== wizard.avatar)
-    }
-    
-    return newWizards
-  }
-
-  // 批量添加随机巫师（均分咒）
-  const addRandomWizards = (count: number) => {
-    const newWizards = generateRandomWizards(count, wizards.length)
-    const finalWizards = [...wizards, ...newWizards]
-    setWizards(finalWizards)
-    // 均分咒：如果没有设置付款人，默认第一个巫师为付款人
-    if (!payerId && finalWizards.length > 0) {
-      setPayerId(finalWizards[0].id)
-    }
-    // 同步到伙伴列表
-    newWizards.forEach(w => {
-      addOrUpdateCompanion(w.name, w.avatar)
-    })
-    // 刷新伙伴列表状态，使两个咒语都能召唤刚添加的巫师
-    setCompanions(getCompanions())
-    Taro.showToast({ title: `已添加${count}位巫师`, icon: 'success' })
   }
 
   // 均分咒：手动添加巫师（同时同步到伙伴列表）
@@ -1180,7 +1102,7 @@ export default function Index() {
         <Text className='selector-icon'>{selectedContractId ? '📜' : '📋'}</Text>
         <Text className='selector-text'>
           {selectedContractId
-            ? contracts.find(c => c.contractId === selectedContractId)?.name || '契约'
+            ? contracts.find(c => c._id === selectedContractId)?.name || '契约账本'
             : '本地记账'}
         </Text>
         <Text className='selector-arrow'>▼</Text>
@@ -1214,10 +1136,6 @@ export default function Index() {
             <View className='form-section'>
               <Text className='form-label'>参与巫师 ({wizards.length}/30)</Text>
               <View className='add-buttons'>
-                <Button className='quick-add-btn' size='mini' onClick={openQuickAddModal}>
-                  <Text className='btn-icon'>🔢</Text>
-                  <Text>数量添加</Text>
-                </Button>
                 {companions.length > 0 && (
                   <Button 
                     className='add-companion-btn' 
@@ -1228,10 +1146,6 @@ export default function Index() {
                     <Text>召唤伙伴</Text>
                   </Button>
                 )}
-                <Button className='add-random-btn' size='mini' onClick={addRandomWizard}>
-                  <Text className='btn-icon'>+</Text>
-                  <Text>随机</Text>
-                </Button>
                 <Button 
                   className='add-random-btn' 
                   size='mini' 
@@ -1950,19 +1864,19 @@ export default function Index() {
                 <View className='contract-picker-list'>
                   {contracts.map((contract) => (
                     <View
-                      key={contract.contractId}
-                      className={`contract-option ${selectedContractId === contract.contractId ? 'selected' : ''}`}
+                      key={contract._id}
+                      className={`contract-option ${selectedContractId === contract._id ? 'selected' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleSelectContract(contract.contractId)
+                        handleSelectContract(contract._id)
                       }}
                     >
                       <Text className='option-icon'>📜</Text>
                       <View className='option-info'>
                         <Text className='option-name'>{contract.name}</Text>
-                        <Text className='option-hint'>{contract.memberCount} 位巫师</Text>
+                        <Text className='option-hint'>{contract.memberCount || contract.members?.length || 0} 位巫师</Text>
                       </View>
-                      {selectedContractId === contract.contractId && <Text className='check-icon'>✓</Text>}
+                      {selectedContractId === contract._id && <Text className='check-icon'>✓</Text>}
                     </View>
                   ))}
                 </View>
@@ -1993,27 +1907,6 @@ export default function Index() {
             <View className='modal-actions'>
               <View className='modal-cancel' onClick={(e) => { e.stopPropagation(); setShowCreateEvent(false); }}>取消</View>
               <View className='modal-confirm' onClick={(e) => { e.stopPropagation(); createAndLinkEvent(); }}>创建并关联</View>
-            </View>
-          </View>
-        </View>
-      )}
-
-      {/* 快速添加巫师数量弹窗 */}
-      {showQuickAddModal && (
-        <View className='modal-mask' onClick={() => setShowQuickAddModal(false)}>
-          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <Text className='modal-title'>快速添加巫师</Text>
-            <Text className='modal-hint'>输入需要添加的巫师数量</Text>
-            <Input
-              className='modal-input number-input'
-              type='number'
-              value={wizardCount}
-              onInput={(e) => setWizardCount(e.detail.value)}
-              placeholder='输入数量'
-            />
-            <View className='modal-actions'>
-              <Text className='modal-cancel' onClick={() => setShowQuickAddModal(false)}>取消</Text>
-              <Text className='modal-confirm' onClick={confirmQuickAdd}>确认</Text>
             </View>
           </View>
         </View>

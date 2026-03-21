@@ -337,6 +337,60 @@ export async function removeMember(contractId: string, memberId: string): Promis
   }
 }
 
+/**
+ * 获取加入申请列表（守护者查看）
+ */
+export async function getJoinRequests(contractId: string): Promise<CloudResponse<{ requests: any[] }>> {
+  try {
+    // @ts-ignore
+    const result = await Taro.cloud.callFunction({
+      name: 'contract',
+      data: {
+        action: 'getJoinRequests',
+        data: { contractId }
+      }
+    })
+
+    return result.result as CloudResponse<{ requests: any[] }>
+  } catch (error) {
+    console.error('[Cloud] 获取加入申请失败:', error)
+    return {
+      success: false,
+      error: {
+        code: 'GET_JOIN_REQUESTS_ERROR',
+        message: error.message || '获取加入申请失败'
+      }
+    }
+  }
+}
+
+/**
+ * 审批加入申请
+ */
+export async function approveJoinRequest(requestId: string, approve: boolean): Promise<CloudResponse<{ message: string }>> {
+  try {
+    // @ts-ignore
+    const result = await Taro.cloud.callFunction({
+      name: 'contract',
+      data: {
+        action: 'approveJoin',
+        data: { requestId, approve }
+      }
+    })
+
+    return result.result as CloudResponse<{ message: string }>
+  } catch (error) {
+    console.error('[Cloud] 审批加入申请失败:', error)
+    return {
+      success: false,
+      error: {
+        code: 'APPROVE_JOIN_ERROR',
+        message: error.message || '审批加入申请失败'
+      }
+    }
+  }
+}
+
 // ============ 账单相关 ============
 
 /**

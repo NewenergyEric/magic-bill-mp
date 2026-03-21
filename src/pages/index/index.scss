@@ -353,28 +353,34 @@ $ink: #2c1e1a;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16rpx 32rpx;
-  background: linear-gradient(135deg, rgba($magic-gold, 0.15) 0%, rgba($magic-burgundy, 0.1) 100%);
-  border: 2rpx solid rgba($magic-gold, 0.3);
-  border-radius: 40rpx;
+  padding: 20rpx 40rpx;
+  background: linear-gradient(135deg, $magic-gold 0%, darken($magic-gold, 15%) 100%);
+  border: 3rpx solid rgba($ink, 0.2);
+  border-radius: 50rpx;
   margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba($magic-gold, 0.4);
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
 }
 
 .selector-icon {
-  font-size: 28rpx;
-  margin-right: 12rpx;
+  font-size: 32rpx;
+  margin-right: 16rpx;
 }
 
 .selector-text {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: $ink;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .selector-arrow {
-  font-size: 20rpx;
-  color: rgba($ink, 0.5);
-  margin-left: 12rpx;
+  font-size: 22rpx;
+  color: rgba($ink, 0.6);
+  margin-left: 16rpx;
 }
 
 // 契约选择弹窗

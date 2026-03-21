@@ -19,6 +19,7 @@ import {
 } from '@/services/ledger'
 import { getCompanions } from '@/services/companions'
 import { shareEvent } from '@/services/share'
+import { createContract, cloudLogin } from '@/services/cloud'
 import { formatAmount } from '@/utils/settlement'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
 import WizardAvatar from '@/components/WizardAvatar'
@@ -48,6 +49,7 @@ export default function LedgerPage() {
   // 创建子收支录
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newSubLedgerName, setNewSubLedgerName] = useState('')
+  const [enableCloudSync, setEnableCloudSync] = useState(false)  // 云端同步开关
   
   // 编辑子收支录名称
   const [showEditModal, setShowEditModal] = useState(false)
@@ -143,17 +145,48 @@ export default function LedgerPage() {
   }
 
   // 确认创建
-  const confirmCreate = () => {
+  const confirmCreate = async () => {
     if (!newSubLedgerName.trim()) {
       Taro.showToast({ title: '请输入名称', icon: 'none' })
       return
     }
+
+    // 如果开启了云端同步，先确保登录
+    if (enableCloudSync) {
+      const loginResult = await cloudLogin()
+      if (!loginResult.success || !loginResult.data) {
+        Taro.showToast({ title: '请先登录', icon: 'none' })
+        return
+      }
+    }
+
+    // 创建本地事件
     const newSubLedger = createSubLedger(newSubLedgerName.trim())
+
+    // 如果开启了云端同步，创建云端契约
+    if (enableCloudSync) {
+      try {
+        const contractResult = await createContract(newSubLedgerName.trim())
+        if (contractResult.success && contractResult.data?.contract) {
+          // 更新本地事件的 cloudId
+          updateSubLedger(newSubLedger._id, { cloudId: contractResult.data.contract._id })
+          Taro.showToast({ title: '已创建共享事件', icon: 'success' })
+        } else {
+          Taro.showToast({ title: '云端同步失败', icon: 'none' })
+        }
+      } catch (e) {
+        console.error('创建云端契约失败', e)
+        Taro.showToast({ title: '云端同步失败', icon: 'none' })
+      }
+    } else {
+      Taro.showToast({ title: '创建成功', icon: 'success' })
+    }
+
     setShowCreateModal(false)
     setNewSubLedgerName('')
+    setEnableCloudSync(false)
     loadData()
-    Taro.showToast({ title: '创建成功', icon: 'success' })
-    
+
     // 提示用户是否直接去记账
     Taro.showModal({
       title: '是否开始记账？',
@@ -982,8 +1015,24 @@ export default function LedgerPage() {
               onInput={(e) => setNewSubLedgerName(e.detail.value)}
               placeholder='请输入事件名称'
             />
+            {/* 云端同步开关 */}
+            <View className='cloud-sync-toggle' onClick={() => setEnableCloudSync(!enableCloudSync)}>
+              <View className='toggle-left'>
+                <Text className='toggle-icon'>📜</Text>
+                <View className='toggle-text'>
+                  <Text className='toggle-title'>共享事件</Text>
+                  <Text className='toggle-desc'>开启后可邀请微信好友共同记账</Text>
+                </View>
+              </View>
+              <View className={`toggle-switch ${enableCloudSync ? 'active' : ''}`}>
+                <View className='toggle-knob' />
+              </View>
+            </View>
             <View className='modal-actions'>
-              <Text className='modal-cancel' onClick={() => setShowCreateModal(false)}>取消</Text>
+              <Text className='modal-cancel' onClick={() => {
+                setShowCreateModal(false)
+                setEnableCloudSync(false)
+              }}>取消</Text>
               <Text className='modal-confirm' onClick={confirmCreate}>施法创建</Text>
             </View>
           </View>

@@ -59,6 +59,7 @@ export interface SubLedger {
   billIds: string[]      // 关联的账单ID列表
   totalAmount: number    // 总金额
   status: 'active' | 'archived'  // 状态
+  cloudId?: string       // 云端契约ID（开启云端同步时）
 }
 
 // 收支录（主账本）

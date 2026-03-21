@@ -7,10 +7,11 @@ import { useState, useEffect } from 'react'
 import { View, Text, Input } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useUser } from '@/contexts/UserContext'
-import { cloudLogin, createContract, joinContract, getMyContracts, getContractDetail, removeMember, refreshInviteCode, getBillsByContract, createCloudBill } from '@/services/cloud'
+import { cloudLogin, createContract, joinContract, getMyContracts, getContractDetail, removeMember, refreshInviteCode, getBillsByContract, createCloudBill, getJoinRequests, approveJoinRequest } from '@/services/cloud'
 import { getWizardTitle } from '@/services/wizard'
 import WizardAvatar from '@/components/WizardAvatar'
 import UserLogin from '@/components/UserLogin'
+import HowlerRequests from '@/components/HowlerRequests'
 import './index.scss'
 
 export default function ContractPage() {
@@ -582,22 +583,22 @@ export default function ContractPage() {
             </View>
           ) : (
             contractBills.map((bill: any) => (
-              <View key={bill._id} className='bill-item'>
-                <View className='bill-info'>
-                  <Text className='bill-name'>{bill.eventName || '未命名账单'}</Text>
-                  <Text className='bill-meta'>
-                    {bill.spellType === 'simple' ? '均分咒' : '清算咒'} · {bill.participants?.length || 0}人 · ¥{(bill.totalAmount / 100).toFixed(2)}
-                  </Text>
-                  {bill.settlements && bill.settlements.length > 0 && (
-                    <View className='bill-settlements'>
-                      {bill.settlements.map((s: any, idx: number) => (
-                        <Text key={idx} className='settlement-text'>
-                          {s.from} → {s.to}: ¥{(s.amount / 100).toFixed(2)}
-                        </Text>
-                      ))}
-                    </View>
-                  )}
+              <View
+                key={bill._id}
+                className='subledger-item'
+                onClick={() => {
+                  // 跳转到施咒页面继续记账，关联到此账单
+                  Taro.setStorageSync('active_contract_id', currentContract._id)
+                  Taro.setStorageSync('active_bill_id', bill._id)
+                  Taro.switchTab({ url: '/pages/index/index' })
+                }}
+              >
+                <View className='subledger-icon'>📜</View>
+                <View className='subledger-info'>
+                  <Text className='subledger-name'>{bill.eventName || '未命名账单'}</Text>
+                  <Text className='subledger-amount'>¥{(bill.totalAmount / 100).toFixed(2)}</Text>
                 </View>
+                <Text className='check-icon'>›</Text>
               </View>
             ))
           )}
@@ -607,6 +608,18 @@ export default function ContractPage() {
         <View className='hint-card'>
           <Text className='hint-icon'>💡</Text>
           <Text className='hint-text'>去首页施咒页面记账，账单会自动同步到当前契约</Text>
+        </View>
+
+        {/* 跳转到施咒按钮 */}
+        <View
+          className='go-to-cast-btn'
+          onClick={() => {
+            // 将契约ID存入本地，跳转后自动选中
+            Taro.setStorageSync('active_contract_id', currentContract._id)
+            Taro.switchTab({ url: '/pages/index/index' })
+          }}
+        >
+          <Text className='go-to-cast-btn-text'>⚡ 立即去施咒记账</Text>
         </View>
 
         {/* 守护者功能 */}
@@ -641,6 +654,16 @@ export default function ContractPage() {
             </View>
           </View>
         )}
+
+        {/* 待审批吼叫信 */}
+        <HowlerRequests contractId={currentContract._id} isGuardian={isGuardian} cloudUserId={cloudUserId} onRefresh={() => {
+          // 刷新详情
+          getContractDetail(currentContract._id).then((detail) => {
+            if (detail.success && detail.data) {
+              setCurrentContract(detail.data.contract)
+            }
+          })
+        }} />
       </View>
     )
   }
