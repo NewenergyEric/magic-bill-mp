@@ -51,7 +51,19 @@ export interface CloudUser {
   createTime: number
 }
 
-// 子收支录（消费事件）
+// 事件成员
+export interface EventMember {
+  id: string             // 唯一标识（自定义巫师用本地ID，微信用户用openid）
+  name: string           // 显示名称
+  avatar?: string        // 头像（emoji或URL）
+  type: 'custom' | 'wechat'  // 类型：自定义巫师 或 微信用户
+  wechatOpenid?: string  // 微信用户的openid（type=wechat时有值）
+  cloudUserId?: string   // 云端用户ID
+  joinTime: number       // 加入时间
+  invitedBy?: string     // 被谁邀请的（用户ID）
+}
+
+// 子收支录（消费事件）- 相当于总账单
 export interface SubLedger {
   _id: string
   name: string           // 事件名称
@@ -60,6 +72,8 @@ export interface SubLedger {
   totalAmount: number    // 总金额
   status: 'active' | 'archived'  // 状态
   cloudId?: string       // 云端契约ID（开启云端同步时）
+  members?: EventMember[] // 事件成员列表（分账主体）
+  creatorId?: string     // 创建者ID
 }
 
 // 收支录（主账本）

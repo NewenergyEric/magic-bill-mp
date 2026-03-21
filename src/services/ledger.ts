@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import { Ledger, SubLedger, Bill } from '@/types'
+import { Ledger, SubLedger, Bill, EventMember } from '@/types'
 import { getCompanions } from './companions'
 
 // 本地存储键名
@@ -125,10 +125,29 @@ export function getArchivedSubLedgers(): SubLedger[] {
 }
 
 /**
- * 创建子收支录
+ * 创建子收支录（事件）
+ * @param name 事件名称
+ * @param creatorId 创建者ID
+ * @param creatorName 创建者名称
+ * @param creatorAvatar 创建者头像
  */
-export function createSubLedger(name: string, cloudId?: string): SubLedger {
+export function createSubLedger(
+  name: string, 
+  creatorId?: string, 
+  creatorName?: string, 
+  creatorAvatar?: string
+): SubLedger {
   const subLedgers = getSubLedgers()
+  
+  // 创建者作为第一个成员
+  const members: EventMember[] = creatorId ? [{
+    id: creatorId,
+    name: creatorName || '创建者',
+    avatar: creatorAvatar || '🧙',
+    type: 'custom',
+    joinTime: Date.now()
+  }] : []
+  
   const newSubLedger: SubLedger = {
     _id: Date.now().toString(),
     name,
@@ -136,11 +155,92 @@ export function createSubLedger(name: string, cloudId?: string): SubLedger {
     billIds: [],
     totalAmount: 0,
     status: 'active',
-    cloudId  // 云端契约ID（可选）
+    members,
+    creatorId
   }
   subLedgers.unshift(newSubLedger)
   Taro.setStorageSync(SUB_LEDGER_KEY, subLedgers)
   return newSubLedger
+}
+
+/**
+ * 添加成员到事件
+ */
+export function addMemberToSubLedger(
+  subLedgerId: string, 
+  member: Omit<EventMember, 'id' | 'joinTime'>
+): EventMember | null {
+  const subLedgers = getSubLedgers()
+  const index = subLedgers.findIndex(s => s._id === subLedgerId)
+  if (index === -1) return null
+  
+  const newMember: EventMember = {
+    ...member,
+    id: member.type === 'wechat' && member.wechatOpenid 
+      ? member.wechatOpenid 
+      : Date.now().toString() + Math.random().toString(36).substr(2, 9),
+    joinTime: Date.now()
+  }
+  
+  if (!subLedgers[index].members) {
+    subLedgers[index].members = []
+  }
+  
+  // 检查是否已存在（根据名称或openid）
+  const exists = subLedgers[index].members!.some(m => 
+    m.name === member.name || 
+    (member.wechatOpenid && m.wechatOpenid === member.wechatOpenid)
+  )
+  if (exists) return null
+  
+  subLedgers[index].members!.push(newMember)
+  Taro.setStorageSync(SUB_LEDGER_KEY, subLedgers)
+  return newMember
+}
+
+/**
+ * 从事件移除成员
+ */
+export function removeMemberFromSubLedger(subLedgerId: string, memberId: string): boolean {
+  const subLedgers = getSubLedgers()
+  const index = subLedgers.findIndex(s => s._id === subLedgerId)
+  if (index === -1 || !subLedgers[index].members) return false
+  
+  subLedgers[index].members = subLedgers[index].members!.filter(m => m.id !== memberId)
+  Taro.setStorageSync(SUB_LEDGER_KEY, subLedgers)
+  return true
+}
+
+/**
+ * 获取事件的成员列表
+ */
+export function getSubLedgerMembers(subLedgerId: string): EventMember[] {
+  const subLedgers = getSubLedgers()
+  const subLedger = subLedgers.find(s => s._id === subLedgerId)
+  return subLedger?.members || []
+}
+
+/**
+ * 更新成员信息（如自定义巫师升级为微信用户）
+ */
+export function updateMemberInSubLedger(
+  subLedgerId: string, 
+  memberId: string, 
+  data: Partial<EventMember>
+): boolean {
+  const subLedgers = getSubLedgers()
+  const index = subLedgers.findIndex(s => s._id === subLedgerId)
+  if (index === -1 || !subLedgers[index].members) return false
+  
+  const memberIndex = subLedgers[index].members!.findIndex(m => m.id === memberId)
+  if (memberIndex === -1) return false
+  
+  subLedgers[index].members![memberIndex] = {
+    ...subLedgers[index].members![memberIndex],
+    ...data
+  }
+  Taro.setStorageSync(SUB_LEDGER_KEY, subLedgers)
+  return true
 }
 
 /**

@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react'
 import homeBg from '@/assets/home-bg.png'
 import { getCompanions, WizardCompanion, canSelectCompanion, addOrUpdateCompanion, addCompanion } from '@/services/companions'
 import { WIZARDS } from '@/constants/wizards'
-import { Bill, Participant, Settlement, SubLedger } from '@/types'
+import { Bill, Participant, Settlement, SubLedger, EventMember } from '@/types'
 import {
   getActiveSubLedgers,
   linkBillToSubLedger,
   saveBill as saveBillToLedger,
   createSubLedger,
-  getRandomEventName
+  getRandomEventName,
+  getSubLedgerMembers,
+  addMemberToSubLedger
 } from '@/services/ledger'
 import { shareBill } from '@/services/share'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
@@ -56,6 +58,10 @@ export default function Index() {
   const [showSubLedgerPicker, setShowSubLedgerPicker] = useState(false)
   const [selectedSubLedgerId, setSelectedSubLedgerId] = useState<string>('')
   const [activeAccountingEvent, setActiveAccountingEvent] = useState<{id: string, name: string} | null>(null)
+  
+  // 当前事件的成员列表
+  const [currentEventMembers, setCurrentEventMembers] = useState<EventMember[]>([])
+  const [showMemberPicker, setShowMemberPicker] = useState(false)
   
   // 是否首次进入（用于控制启动页只显示一次）
   const [hasSeenSplash, setHasSeenSplash] = useState(false)
@@ -137,28 +143,24 @@ export default function Index() {
     }
   }
 
-  // 选择共享事件后自动获取云端参与者
+  // 选择共享事件后加载事件成员
   const handleSelectCloudEvent = async (cloudId: string) => {
     try {
       const res = await getContractDetail(cloudId)
       if (res.success && res.data?.contract) {
-        const members = res.data.contract.members || []
-        // 将契约成员转换为参与者
-        const participants: Participant[] = members.map((m: any) => ({
+        const cloudMembers = res.data.contract.members || []
+        // 将云端成员转换为EventMember格式
+        const members: EventMember[] = cloudMembers.map((m: any) => ({
           id: m.userId,
           name: m.nickname || '巫师',
-          avatar: m.avatar || ''
+          avatar: m.avatar || '',
+          type: 'wechat' as const,
+          wechatOpenid: m.userId,
+          cloudUserId: m.userId,
+          joinTime: m.joinTime || Date.now()
         }))
-
-        // 填充到当前巫师列表
-        if (activeTab === 'simple') {
-          setWizards(participants)
-        } else {
-          setMultiWizards(participants)
-        }
-
-        console.log('[Cloud Event] 已填充云端成员', participants.length)
-        Taro.showToast({ title: '已加载共享成员', icon: 'none' })
+        setCurrentEventMembers(members)
+        console.log('[Cloud Event] 已加载云端成员', members.length)
       }
     } catch (e) {
       console.log('[Cloud Event] 获取云端成员失败', e)
@@ -166,13 +168,21 @@ export default function Index() {
     }
   }
 
-  // 清除成员，回到本地记账模式
+  // 选择本地事件后加载成员
+  const handleSelectLocalEvent = (subLedgerId: string) => {
+    const members = getSubLedgerMembers(subLedgerId)
+    setCurrentEventMembers(members)
+    console.log('[Local Event] 已加载本地成员', members.length)
+  }
+
+  // 清除成员
   const clearMembers = () => {
     if (activeTab === 'simple') {
       setWizards([])
     } else {
       setMultiWizards([])
     }
+    setCurrentEventMembers([])
   }
 
   // 显示邀请巫师弹窗
@@ -527,7 +537,22 @@ export default function Index() {
       return
     }
     if (wizards.length <= 0) {
-      Taro.showToast({ title: '请添加至少1位巫师', icon: 'none' })
+      Taro.showToast({ title: '请选择参与成员', icon: 'none' })
+      return
+    }
+
+    // 检查是否选择了事件
+    if (!selectedSubLedgerId) {
+      Taro.showModal({
+        title: '请选择事件',
+        content: '记账前需要选择一个事件，是否现在选择？',
+        confirmText: '去选择',
+        success: (res) => {
+          if (res.confirm) {
+            setShowSubLedgerPicker(true)
+          }
+        }
+      })
       return
     }
 
@@ -562,11 +587,15 @@ export default function Index() {
         participants: participantsWithPaid,
         settlements: [],
         payerId: actualPayerId
-      }
+      },
+      subLedgerId: selectedSubLedgerId  // 直接关联事件
     }
 
     // 保存账单
     let savedBill = saveBillToLedger(bill)
+
+    // 关联账单到事件
+    linkBillToSubLedger(savedBill._id, selectedSubLedgerId)
 
     // 如果选择了有cloudId的事件，同时创建云端账单
     const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
@@ -628,6 +657,9 @@ export default function Index() {
       })
     }
 
+    // 更新事件列表
+    setSubLedgers(getActiveSubLedgers())
+    
     setShowResult(true)
   }
 
@@ -989,7 +1021,22 @@ export default function Index() {
   // 清算咒：计算
   const calculateMulti = async () => {
     if (multiWizards.length < 2) {
-      Taro.showToast({ title: '请至少添加2位巫师', icon: 'none' })
+      Taro.showToast({ title: '请选择至少2位成员', icon: 'none' })
+      return
+    }
+
+    // 检查是否选择了事件
+    if (!selectedSubLedgerId) {
+      Taro.showModal({
+        title: '请选择事件',
+        content: '记账前需要选择一个事件，是否现在选择？',
+        confirmText: '去选择',
+        success: (res) => {
+          if (res.confirm) {
+            setShowSubLedgerPicker(true)
+          }
+        }
+      })
       return
     }
 
@@ -1023,10 +1070,14 @@ export default function Index() {
       totalAmount: totalInCents,  // 单位：分
       participantsCount: multiWizards.length,
       date: Date.now(),
-      details: { participants: multiWizards, settlements }
+      details: { participants: multiWizards, settlements },
+      subLedgerId: selectedSubLedgerId  // 直接关联事件
     }
 
     const savedBill = saveBillToLedger(bill)
+
+    // 关联账单到事件
+    linkBillToSubLedger(savedBill._id, selectedSubLedgerId)
 
     // 如果选择了有cloudId的事件，同时创建云端账单
     const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
@@ -1272,61 +1323,45 @@ export default function Index() {
 
             {/* 添加巫师按钮 */}
             <View className='form-section'>
-              <Text className='form-label'>参与巫师 ({wizards.length}/30)</Text>
-              <View className='add-buttons'>
-                {companions.length > 0 && (
+              <Text className='form-label'>参与巫师 ({wizards.length})</Text>
+              
+              {/* 如果选择了事件且有成员 */}
+              {selectedSubLedgerId && currentEventMembers.length > 0 ? (
+                <View className='add-buttons'>
                   <Button
                     className='add-companion-btn'
                     size='mini'
-                    onClick={() => setShowCompanionPicker(true)}
+                    onClick={() => setShowMemberPicker(true)}
                   >
                     <Text className='btn-icon'>🧙</Text>
-                    <Text>召唤伙伴</Text>
+                    <Text>选择成员</Text>
                   </Button>
-                )}
-                {/* 如果选择了共享事件，显示邀请巫师按钮 */}
-                {selectedSubLedgerId && subLedgers.find(sl => sl._id === selectedSubLedgerId)?.cloudId && (
+                </View>
+              ) : selectedSubLedgerId && currentEventMembers.length === 0 ? (
+                /* 如果选择了事件但没有成员 */
+                <View className='no-members-hint'>
+                  <Text className='hint-text'>该事件暂无成员，请先去古灵阁添加成员</Text>
                   <Button
-                    className='add-random-btn'
+                    className='go-add-btn'
                     size='mini'
-                    onClick={() => handleShowInvite()}
+                    onClick={() => Taro.switchTab({ url: '/pages/ledger/index' })}
                   >
-                    <Text className='btn-icon'>📜</Text>
-                    <Text>邀请巫师</Text>
+                    去添加
                   </Button>
-                )}
-                <Button
-                  className='add-random-btn'
-                  size='mini'
-                  onClick={() => setShowSimpleAddForm(true)}
-                >
-                  <Text className='btn-icon'>✏️</Text>
-                  <Text>添加巫师</Text>
-                </Button>
-              </View>
+                </View>
+              ) : (
+                /* 如果没有选择事件 */
+                <View className='no-event-hint' onClick={() => setShowSubLedgerPicker(true)}>
+                  <Text className='hint-text'>👆 请先选择一个事件</Text>
+                </View>
+              )}
             </View>
-
-            {/* 添加表单 */}
-            {showSimpleAddForm && (
-              <View className='add-form-inline'>
-                <Input
-                  className='name-input'
-                  type='text'
-                  value={simpleNewWizardName}
-                  onInput={(e) => setSimpleNewWizardName(e.detail.value)}
-                  placeholder='输入姓名'
-                  autoFocus
-                />
-                <Text className='cancel-text' onClick={() => { setShowSimpleAddForm(false); setSimpleNewWizardName('') }}>取消</Text>
-                <Text className='confirm-text' onClick={addSimpleWizard}>确认</Text>
-              </View>
-            )}
 
             {/* 巫师列表 */}
             <View className='wizards-list-simple'>
               {wizards.length === 0 ? (
                 <View className='empty-wizards'>
-                  <Text className='empty-text'>点击上方按钮召唤巫师</Text>
+                  <Text className='empty-text'>请选择事件成员参与记账</Text>
                 </View>
               ) : (
                 <>
@@ -1929,24 +1964,26 @@ export default function Index() {
                 <View className='subledger-picker-list'>
                   {subLedgers.map((sl) => {
                     const isSelected = selectedSubLedgerId === sl._id
+                    const memberCount = sl.members?.length || 0
                     return (
                       <View 
                         key={sl._id} 
                         className={`subledger-item ${isSelected ? 'selected' : ''}`}
                         onClick={(e) => { 
                           e.stopPropagation(); 
-                          console.log('Selected subledger:', sl._id, sl.name, 'cloudId:', sl.cloudId);
                           setSelectedSubLedgerId(sl._id); 
-                          // 如果有cloudId，自动获取云端参与者
+                          // 加载事件成员
                           if (sl.cloudId) {
                             handleSelectCloudEvent(sl.cloudId)
+                          } else {
+                            handleSelectLocalEvent(sl._id)
                           }
                         }}
                       >
                         <View className='subledger-icon'>{sl.cloudId ? '📜' : '📋'}</View>
                         <View className='subledger-info'>
                           <Text className='subledger-name'>{sl.name}</Text>
-                          <Text className='subledger-amount'>¥{(sl.totalAmount / 100).toFixed(2)}</Text>
+                          <Text className='subledger-meta'>{memberCount}人 · ¥{(sl.totalAmount / 100).toFixed(2)}</Text>
                         </View>
                         {isSelected && <Text className='check-icon'>✓</Text>}
                       </View>
@@ -2065,6 +2102,72 @@ export default function Index() {
             <View className='modal-actions'>
               <Text className='modal-cancel' onClick={() => setShowJoinModal(false)}>取消</Text>
               <Text className='modal-confirm' onClick={handleJoinContract}>{joinLoading ? '加入中...' : '确认加入'}</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 成员选择弹窗 */}
+      {showMemberPicker && (
+        <View className='modal-mask' onClick={() => setShowMemberPicker(false)}>
+          <View className='member-picker' onClick={(e) => e.stopPropagation()}>
+            <View className='picker-header'>
+              <Text className='picker-title'>选择参与成员</Text>
+              <View className='picker-close' onClick={() => setShowMemberPicker(false)}>
+                <Text className='close-icon'>✕</Text>
+              </View>
+            </View>
+            
+            <View className='member-picker-list'>
+              {currentEventMembers.map((member) => {
+                const isSelected = activeTab === 'simple' 
+                  ? wizards.some(w => w.id === member.id)
+                  : multiWizards.some(w => w.id === member.id)
+                return (
+                  <View 
+                    key={member.id} 
+                    className={`member-picker-item ${isSelected ? 'selected' : ''}`}
+                    onClick={() => {
+                      if (activeTab === 'simple') {
+                        if (isSelected) {
+                          setWizards(wizards.filter(w => w.id !== member.id))
+                        } else {
+                          setWizards([...wizards, {
+                            id: member.id,
+                            name: member.name,
+                            avatar: member.avatar,
+                            paid: 0
+                          }])
+                        }
+                      } else {
+                        if (isSelected) {
+                          setMultiWizards(multiWizards.filter(w => w.id !== member.id))
+                        } else {
+                          setMultiWizards([...multiWizards, {
+                            id: member.id,
+                            name: member.name,
+                            avatar: member.avatar,
+                            paid: 0
+                          }])
+                        }
+                      }
+                    }}
+                  >
+                    <View className={`checkbox ${isSelected ? 'checked' : ''}`}>
+                      {isSelected && <Text className='check-mark'>✓</Text>}
+                    </View>
+                    <WizardAvatar name={member.avatar || '🧙'} size='small' />
+                    <Text className='member-name'>{member.name}</Text>
+                    {member.type === 'wechat' && <Text className='member-tag'>微信</Text>}
+                  </View>
+                )
+              })}
+            </View>
+            
+            <View className='picker-footer'>
+              <Button className='confirm-btn' onClick={() => setShowMemberPicker(false)}>
+                确认选择
+              </Button>
             </View>
           </View>
         </View>

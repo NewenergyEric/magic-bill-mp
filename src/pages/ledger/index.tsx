@@ -1,7 +1,7 @@
 import { View, Text, Input, ScrollView, Button, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { SubLedger, Bill } from '@/types'
+import { SubLedger, Bill, EventMember } from '@/types'
 import { 
   getActiveSubLedgers, 
   createSubLedger, 
@@ -15,7 +15,10 @@ import {
   saveSubLedgerSettledStatus,
   getSubLedgerSettledStatus,
   ParticipantSettlement,
-  BillSettlementDetail
+  BillSettlementDetail,
+  addMemberToSubLedger,
+  removeMemberFromSubLedger,
+  getSubLedgerMembers
 } from '@/services/ledger'
 import { getCompanions, addCompanion } from '@/services/companions'
 import { shareEvent } from '@/services/share'
@@ -69,6 +72,9 @@ export default function LedgerPage() {
   const [showAddWizard, setShowAddWizard] = useState(false)
   const [newWizardName, setNewWizardName] = useState('')
   const [newWizardAvatar, setNewWizardAvatar] = useState('')
+  
+  // 邀请目标成员（用于升级自定义巫师）
+  const [inviteTargetMember, setInviteTargetMember] = useState<EventMember | null>(null)
 
   // 显示邀请弹窗（新建后邀请）
   const openInviteForNew = async (subLedger: SubLedger) => {
@@ -108,9 +114,10 @@ export default function LedgerPage() {
     setShowAddWizard(false)
     setNewWizardName('')
     setNewWizardAvatar('')
+    setInviteTargetMember(null)
   }
 
-  // 添加自定义巫师到休息室
+  // 添加自定义巫师到事件
   const handleAddWizardToRoom = () => {
     if (!newWizardName.trim()) {
       Taro.showToast({ title: '请输入巫师名字', icon: 'none' })
@@ -118,22 +125,30 @@ export default function LedgerPage() {
     }
 
     // 添加到休息室
-    addCompanion({
+    const newCompanion = addCompanion({
       name: newWizardName.trim(),
       avatar: newWizardAvatar || '🧙'
     })
 
-    // 如果是新建事件，同步到事件参与者
-    if (currentInviteSubLedger && !currentInviteSubLedger.cloudId) {
-      // 关联巫师到事件（本地）
-      linkWizardToSubLedger(currentInviteSubLedger._id, newWizardName.trim())
+    // 添加到事件成员列表
+    if (currentInviteSubLedger) {
+      const member = addMemberToSubLedger(currentInviteSubLedger._id, {
+        name: newWizardName.trim(),
+        avatar: newWizardAvatar || '🧙',
+        type: 'custom'
+      })
+      
+      if (member) {
+        Taro.showToast({ title: '已添加成员', icon: 'success' })
+      } else {
+        Taro.showToast({ title: '该成员已存在', icon: 'none' })
+      }
     }
 
     setShowAddWizard(false)
     setNewWizardName('')
     setNewWizardAvatar('')
     loadData()
-    Taro.showToast({ title: '已添加巫师', icon: 'success' })
   }
 
   // 发送微信邀请（自动创建云端契约）
@@ -293,11 +308,18 @@ export default function LedgerPage() {
       return
     }
 
-    // 先确保登录（如果后续需要云端）
-    await cloudLogin()
+    // 先确保登录（获取用户信息）
+    const loginResult = await cloudLogin()
+    const { userCompanion } = require('@/contexts/UserContext').useUserContext()
+    const currentUserCompanion = userCompanion?.()
 
-    // 创建本地事件
-    const newSubLedger = createSubLedger(newSubLedgerName.trim())
+    // 创建本地事件，创建者作为第一个成员
+    const newSubLedger = createSubLedger(
+      newSubLedgerName.trim(),
+      loginResult.data?.userId,
+      currentUserCompanion?.name || '创建者',
+      currentUserCompanion?.avatar || '🧙'
+    )
 
     setShowCreateModal(false)
     setNewSubLedgerName('')
@@ -306,7 +328,7 @@ export default function LedgerPage() {
 
     Taro.showToast({ title: '创建成功', icon: 'success' })
 
-    // 立即打开邀请界面
+    // 立即打开邀请界面（添加成员）
     setCurrentInviteSubLedger(newSubLedger)
     setShowInviteModal(true)
   }
@@ -1078,8 +1100,50 @@ export default function LedgerPage() {
           <View className='detail-content' onClick={(e) => e.stopPropagation()}>
             <View className='detail-header'>
               <Text className='detail-title'>{selectedSubLedger.name}</Text>
+              {selectedSubLedger.cloudId && <Text className='cloud-badge'>📜 共享</Text>}
               <View className='detail-close' onClick={closeSubLedgerDetail}>
                 <Text className='close-icon'>✕</Text>
+              </View>
+            </View>
+
+            {/* 成员管理区域 */}
+            <View className='members-section'>
+              <View className='section-header'>
+                <Text className='section-title'>参与成员 ({selectedSubLedger.members?.length || 0})</Text>
+                <View className='add-member-btn' onClick={() => {
+                  setCurrentInviteSubLedger(selectedSubLedger)
+                  setShowInviteModal(true)
+                }}>
+                  <Text className='add-icon'>+</Text>
+                  <Text className='add-text'>添加</Text>
+                </View>
+              </View>
+              <View className='members-list'>
+                {(!selectedSubLedger.members || selectedSubLedger.members.length === 0) ? (
+                  <Text className='no-members'>暂无成员，点击添加</Text>
+                ) : (
+                  selectedSubLedger.members.map(member => (
+                    <View key={member.id} className='member-item'>
+                      <View className='member-avatar'>
+                        <WizardAvatar name={member.avatar || '🧙'} size='small' />
+                      </View>
+                      <Text className='member-name'>{member.name}</Text>
+                      {member.type === 'wechat' && <Text className='member-type'>微信</Text>}
+                      {member.type === 'custom' && !member.wechatOpenid && (
+                        <View 
+                          className='invite-link'
+                          onClick={() => {
+                            setCurrentInviteSubLedger(selectedSubLedger)
+                            setInviteTargetMember(member)
+                            setShowInviteModal(true)
+                          }}
+                        >
+                          <Text className='invite-link-text'>邀请</Text>
+                        </View>
+                      )}
+                    </View>
+                  ))
+                )}
               </View>
             </View>
 
@@ -1098,11 +1162,6 @@ export default function LedgerPage() {
               </View>
               {/* 次操作按钮行 */}
               <View className='detail-actions-secondary'>
-                {selectedSubLedger.cloudId && (
-                  <View className='action-btn share' onClick={() => handleShowInvite(selectedSubLedger)}>
-                    <Text className='btn-text'>邀请</Text>
-                  </View>
-                )}
                 <View className='action-btn share' onClick={() => handleShareEvent(selectedSubLedger)}>
                   <Text className='btn-text'>分享</Text>
                 </View>
