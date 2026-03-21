@@ -1649,3 +1649,40 @@ $ink: #2c1e1a;
   font-weight: bold;
   color: $magic-gold;
 }
+
+// 邀请码框
+.invite-code-box {
+  background: rgba($magic-gold, 0.1);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 30rpx 0;
+  text-align: center;
+}
+
+.invite-code {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  letter-spacing: 8rpx;
+}
+
+// 加入契约入口
+.join-contract-entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  margin-top: 20rpx;
+  border-top: 1rpx dashed rgba($magic-gold, 0.3);
+}
+
+.join-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.join-text {
+  font-size: 28rpx;
+  color: $magic-gold;
+}

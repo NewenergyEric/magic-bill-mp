@@ -19,7 +19,7 @@ import {
 } from '@/services/ledger'
 import { getCompanions } from '@/services/companions'
 import { shareEvent } from '@/services/share'
-import { createContract, cloudLogin } from '@/services/cloud'
+import { createContract, cloudLogin, getContractDetail } from '@/services/cloud'
 import { formatAmount } from '@/utils/settlement'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
 import WizardAvatar from '@/components/WizardAvatar'
@@ -58,6 +58,45 @@ export default function LedgerPage() {
   
   // 新手引导
   const [showGuide, setShowGuide] = useState(false)
+
+  // 邀请相关
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [currentInviteCode, setCurrentInviteCode] = useState('')
+  const [currentInviteName, setCurrentInviteName] = useState('')
+
+  // 显示邀请弹窗
+  const handleShowInvite = async (subLedger: SubLedger) => {
+    if (!subLedger.cloudId) {
+      Taro.showToast({ title: '该事件未开启共享', icon: 'none' })
+      return
+    }
+
+    try {
+      const res = await getContractDetail(subLedger.cloudId)
+      if (res.success && res.data?.contract) {
+        setCurrentInviteCode(res.data.contract.inviteCode || '')
+        setCurrentInviteName(subLedger.name)
+        setShowInviteModal(true)
+      } else {
+        Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('[Invite] 获取邀请码失败', e)
+      Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
+    }
+  }
+
+  // 复制邀请码
+  const handleCopyInviteCode = () => {
+    if (currentInviteCode) {
+      Taro.setClipboardData({
+        data: currentInviteCode,
+        success: () => {
+          Taro.showToast({ title: '邀请码已复制', icon: 'success' })
+        }
+      })
+    }
+  }
   
   useDidShow(() => {
     loadData()
@@ -986,6 +1025,11 @@ export default function LedgerPage() {
               </View>
               {/* 次操作按钮行 */}
               <View className='detail-actions-secondary'>
+                {selectedSubLedger.cloudId && (
+                  <View className='action-btn share' onClick={() => handleShowInvite(selectedSubLedger)}>
+                    <Text className='btn-text'>邀请</Text>
+                  </View>
+                )}
                 <View className='action-btn share' onClick={() => handleShareEvent(selectedSubLedger)}>
                   <Text className='btn-text'>分享</Text>
                 </View>
@@ -1034,6 +1078,23 @@ export default function LedgerPage() {
                 setEnableCloudSync(false)
               }}>取消</Text>
               <Text className='modal-confirm' onClick={confirmCreate}>施法创建</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 邀请弹窗 */}
+      {showInviteModal && (
+        <View className='modal-mask' onClick={() => setShowInviteModal(false)}>
+          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
+            <Text className='modal-title'>📜 邀请巫师加入「{currentInviteName}」</Text>
+            <Text className='modal-hint'>分享邀请码，好友加入后即可共同记账</Text>
+            <View className='invite-code-box'>
+              <Text className='invite-code'>{currentInviteCode}</Text>
+            </View>
+            <View className='modal-actions'>
+              <Text className='modal-cancel' onClick={() => setShowInviteModal(false)}>关闭</Text>
+              <Text className='modal-confirm' onClick={handleCopyInviteCode}>复制邀请码</Text>
             </View>
           </View>
         </View>

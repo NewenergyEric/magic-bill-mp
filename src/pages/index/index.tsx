@@ -14,7 +14,7 @@ import {
 } from '@/services/ledger'
 import { shareBill } from '@/services/share'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
-import { cloudLogin, getMyContracts, getContractDetail, getBillsByContract, createCloudBill } from '@/services/cloud'
+import { cloudLogin, getContractDetail, getBillsByContract, createCloudBill, getMyContracts } from '@/services/cloud'
 import { addExpAndCheckAchievements, getLevelBadge, getLevelTitle } from '@/services/wizard'
 import WizardAvatar from '@/components/WizardAvatar'
 import NewbieGuide, { shouldShowGuide } from '@/components/NewbieGuide'
@@ -77,17 +77,13 @@ export default function Index() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [newWizardName, setNewWizardName] = useState('')
 
-  // ========== 契约相关状态 ==========
-  const [contracts, setContracts] = useState<Array<{ _id: string; name: string; memberCount?: number; members?: any[] }>>([])
-  const [selectedContractId, setSelectedContractId] = useState<string>('')
-  const [showContractPicker, setShowContractPicker] = useState(false)
-
-  // 加载契约列表
+  // 加载契约列表（用于获取cloudId对应的契约信息）
   const loadContracts = async () => {
     try {
       const res = await getMyContracts()
       if (res.success && res.data?.contracts) {
-        setContracts(res.data.contracts)
+        // 契约列表已加载，可以在需要时使用
+        console.log('[Contract] 获取契约列表成功', res.data.contracts.length)
       }
     } catch (e) {
       console.log('[Contract] 获取契约列表失败', e)
@@ -96,43 +92,21 @@ export default function Index() {
 
   useEffect(() => {
     loadContracts()
-    // 检查是否有从契约页面跳转过来的契约ID和账单ID
-    const activeContractId = Taro.getStorageSync('active_contract_id')
-    const activeBillId = Taro.getStorageSync('active_bill_id')
-
-    if (activeContractId) {
-      // 清除存储
-      Taro.removeStorageSync('active_contract_id')
-      // 先设置契约ID
-      setSelectedContractId(activeContractId)
-      setShowContractPicker(false)
-
-      // 如果同时有账单ID，加载账单的参与者
-      if (activeBillId) {
-        Taro.removeStorageSync('active_bill_id')
-        // 延迟加载，确保契约ID已设置
-        setTimeout(() => {
-          loadBillParticipants(activeBillId, activeContractId)
-        }, 800)
-      }
-    } else if (activeBillId) {
-      // 只有账单ID的情况（理论上不应该发生）
-      Taro.removeStorageSync('active_bill_id')
-      loadBillParticipants(activeBillId, selectedContractId)
-    }
   }, [])
 
   // 加载账单的参与者，继续记账
-  const loadBillParticipants = async (billId: string, contractId?: string) => {
-    const targetContractId = contractId || selectedContractId
-    if (!targetContractId) {
-      console.log('[Contract] contractId 为空，无法加载账单')
+  const loadBillParticipants = async (billId: string, cloudId?: string) => {
+    // 从subLedger获取cloudId
+    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
+    const targetCloudId = cloudId || currentSubLedger?.cloudId
+    if (!targetCloudId) {
+      console.log('[Contract] cloudId 为空，无法加载账单')
       return
     }
 
     try {
-      console.log('[Contract] 加载账单参与者', { billId, targetContractId })
-      const res = await getBillsByContract(targetContractId)
+      console.log('[Contract] 加载账单参与者', { billId, targetCloudId })
+      const res = await getBillsByContract(targetCloudId)
       console.log('[Contract] getBillsByContract 返回:', JSON.stringify(res))
 
       if (res.success && res.data?.bills) {
@@ -163,45 +137,129 @@ export default function Index() {
     }
   }
 
-  // 选择契约后自动填充成员
-  const handleSelectContract = async (contractId: string) => {
-    setSelectedContractId(contractId)
-    setShowContractPicker(false)
+  // 选择共享事件后自动获取云端参与者
+  const handleSelectCloudEvent = async (cloudId: string) => {
+    try {
+      const res = await getContractDetail(cloudId)
+      if (res.success && res.data?.contract) {
+        const members = res.data.contract.members || []
+        // 将契约成员转换为参与者
+        const participants: Participant[] = members.map((m: any) => ({
+          id: m.userId,
+          name: m.nickname || '巫师',
+          avatar: m.avatar || ''
+        }))
 
-    if (contractId && contracts.length > 0) {
-      const contract = contracts.find(c => c._id === contractId)
-      if (contract) {
-        try {
-          const res = await getContractDetail(contractId)
-          if (res.success && res.data?.contract) {
-            const members = res.data.contract.members || []
-            // 将契约成员转换为参与者
-            const participants: Participant[] = members.map((m: any) => ({
-              id: m.userId,
-              name: m.nickname || '巫师',
-              avatar: m.avatar || ''
-            }))
-
-            // 填充到当前巫师列表
-            if (activeTab === 'simple') {
-              setWizards(participants)
-            } else {
-              setMultiWizards(participants)
-            }
-
-            console.log('[Contract] 已填充契约成员', participants.length)
-          }
-        } catch (e) {
-          console.log('[Contract] 获取契约成员失败', e)
+        // 填充到当前巫师列表
+        if (activeTab === 'simple') {
+          setWizards(participants)
+        } else {
+          setMultiWizards(participants)
         }
+
+        console.log('[Cloud Event] 已填充云端成员', participants.length)
+        Taro.showToast({ title: '已加载共享成员', icon: 'none' })
       }
+    } catch (e) {
+      console.log('[Cloud Event] 获取云端成员失败', e)
+      Taro.showToast({ title: '获取成员失败', icon: 'none' })
+    }
+  }
+
+  // 清除成员，回到本地记账模式
+  const clearMembers = () => {
+    if (activeTab === 'simple') {
+      setWizards([])
     } else {
-      // 清除成员，回到本地记账模式
-      if (activeTab === 'simple') {
-        setWizards([])
-      } else {
-        setMultiWizards([])
+      setMultiWizards([])
+    }
+  }
+
+  // 显示邀请巫师弹窗
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteCode, setInviteCode] = useState('')
+
+  // 加入契约相关
+  const [showJoinModal, setShowJoinModal] = useState(false)
+  const [joinCode, setJoinCode] = useState('')
+  const [joinLoading, setJoinLoading] = useState(false)
+
+  // 显示加入契约弹窗
+  const handleShowJoinContract = () => {
+    setJoinCode('')
+    setShowJoinModal(true)
+  }
+
+  // 执行加入契约
+  const handleJoinContract = async () => {
+    if (!joinCode.trim()) {
+      Taro.showToast({ title: '请输入邀请码', icon: 'none' })
+      return
+    }
+
+    setJoinLoading(true)
+    try {
+      // 先确保云端登录
+      const loginResult = await cloudLogin(
+        userCompanion?.name || '神秘巫师',
+        userCompanion?.avatar || ''
+      )
+      if (!loginResult.success || !loginResult.data) {
+        Taro.showToast({ title: '请先登录', icon: 'none' })
+        setJoinLoading(false)
+        return
       }
+
+      const { joinContract } = require('@/services/cloud')
+      const result = await joinContract(joinCode.trim().toUpperCase())
+
+      if (result.success && result.data) {
+        Taro.showToast({ title: '加入成功', icon: 'success' })
+        setShowJoinModal(false)
+        // 刷新契约列表
+        loadContracts()
+        // 刷新事件列表
+        setSubLedgers(getActiveSubLedgers())
+      } else {
+        Taro.showToast({ title: result.error?.message || '加入失败', icon: 'none' })
+      }
+    } catch (e: any) {
+      console.error('[Join] 加入契约失败', e)
+      Taro.showToast({ title: e.message || '加入失败', icon: 'none' })
+    } finally {
+      setJoinLoading(false)
+    }
+  }
+
+  const handleShowInvite = async () => {
+    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
+    if (!currentSubLedger?.cloudId) {
+      Taro.showToast({ title: '请先选择一个共享事件', icon: 'none' })
+      return
+    }
+
+    try {
+      const res = await getContractDetail(currentSubLedger.cloudId)
+      if (res.success && res.data?.contract?.inviteCode) {
+        setInviteCode(res.data.contract.inviteCode)
+        setShowInviteModal(true)
+      } else {
+        Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('[Invite] 获取邀请码失败', e)
+      Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
+    }
+  }
+
+  const handleCopyInviteCode = () => {
+    if (inviteCode) {
+      Taro.setClipboardData({
+        data: inviteCode,
+        success: () => {
+          Taro.showToast({ title: '邀请码已复制', icon: 'success' })
+        }
+      })
     }
   }
 
@@ -428,44 +486,39 @@ export default function Index() {
     // 保存账单
     let savedBill = saveBillToLedger(bill)
 
-    // 如果选择了契约，同时创建云端账单
-    if (selectedContractId && contracts.length > 0) {
+    // 如果选择了有cloudId的事件，同时创建云端账单
+    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
+    if (currentSubLedger?.cloudId) {
       try {
-        const contract = contracts.find(c => c._id === selectedContractId)
-        if (contract) {
-          // 构建云端账单参与者
-          const cloudParticipants = participantsWithPaid.map(w => ({
-            userId: w.id,
-            name: w.name,
-            avatar: w.avatar || '',
-            paid: w.paid,
-            consumed: perPersonInCents
-          }))
+        // 构建云端账单参与者
+        const cloudParticipants = participantsWithPaid.map(w => ({
+          userId: w.id,
+          name: w.name,
+          avatar: w.avatar || '',
+          paid: w.paid,
+          consumed: perPersonInCents
+        }))
 
-          // 获取当前用户信息
-          const currentUser = user || userCompanion
+        // 调用云端创建账单
+        const cloudRes = await createCloudBill({
+          contractId: currentSubLedger.cloudId,
+          eventName,
+          spellType: 'simple',
+          totalAmount: aInCents,
+          avgInCents: perPersonInCents,
+          participants: cloudParticipants
+        })
 
-          // 调用云端创建账单
-          const cloudRes = await createCloudBill({
-            contractId: selectedContractId,
-            eventName,
-            spellType: 'simple',
-            totalAmount: aInCents,
-            avgInCents: perPersonInCents,
-            participants: cloudParticipants
+        if (cloudRes.success && cloudRes.data?.bill?._id) {
+          // 更新本地账单，标记为已同步
+          savedBill = saveBillToLedger({
+            ...savedBill,
+            cloudId: cloudRes.data.bill._id,
+            contractId: currentSubLedger.cloudId
           })
-
-          if (cloudRes.success && cloudRes.data?.bill?._id) {
-            // 更新本地账单，标记为已同步
-            savedBill = saveBillToLedger({
-              ...savedBill,
-              cloudId: cloudRes.data.bill._id,
-              contractId: selectedContractId
-            })
-            console.log('[Contract] 云端账单创建成功', cloudRes.data)
-          } else {
-            console.log('[Contract] 云端账单创建失败', cloudRes.message)
-          }
+          console.log('[Contract] 云端账单创建成功', cloudRes.data)
+        } else {
+          console.log('[Contract] 云端账单创建失败', cloudRes.message)
         }
       } catch (e) {
         console.log('[Contract] 创建云端账单异常', e)
@@ -893,8 +946,9 @@ export default function Index() {
 
     const savedBill = saveBillToLedger(bill)
 
-    // 如果选择了契约，同时创建云端账单
-    if (selectedContractId && contracts.length > 0) {
+    // 如果选择了有cloudId的事件，同时创建云端账单
+    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
+    if (currentSubLedger?.cloudId) {
       try {
         const cloudParticipants = multiWizards.map(w => ({
           userId: w.id,
@@ -905,7 +959,7 @@ export default function Index() {
         }))
 
         const cloudRes = await createCloudBill({
-          contractId: selectedContractId,
+          contractId: currentSubLedger.cloudId,
           eventName,
           spellType: 'multi',
           totalAmount: totalInCents,
@@ -917,7 +971,7 @@ export default function Index() {
           saveBillToLedger({
             ...savedBill,
             cloudId: cloudRes.data.bill._id,
-            contractId: selectedContractId
+            contractId: currentSubLedger.cloudId
           })
           console.log('[Contract] 云端账单创建成功', cloudRes.data)
         }
@@ -1097,13 +1151,15 @@ export default function Index() {
         </View>
       </View>
 
-      {/* 契约选择器 */}
-      <View className='contract-selector' onClick={() => setShowContractPicker(true)}>
-        <Text className='selector-icon'>{selectedContractId ? '📜' : '📋'}</Text>
+      {/* 事件选择器 */}
+      <View className='contract-selector' onClick={() => setShowSubLedgerPicker(true)}>
+        <Text className='selector-icon'>
+          {selectedSubLedgerId && subLedgers.find(sl => sl._id === selectedSubLedgerId)?.cloudId ? '📜' : '📋'}
+        </Text>
         <Text className='selector-text'>
-          {selectedContractId
-            ? contracts.find(c => c._id === selectedContractId)?.name || '契约账本'
-            : '本地记账'}
+          {selectedSubLedgerId
+            ? subLedgers.find(sl => sl._id === selectedSubLedgerId)?.name || '选择事件'
+            : '选择事件'}
         </Text>
         <Text className='selector-arrow'>▼</Text>
       </View>
@@ -1137,18 +1193,29 @@ export default function Index() {
               <Text className='form-label'>参与巫师 ({wizards.length}/30)</Text>
               <View className='add-buttons'>
                 {companions.length > 0 && (
-                  <Button 
-                    className='add-companion-btn' 
-                    size='mini' 
+                  <Button
+                    className='add-companion-btn'
+                    size='mini'
                     onClick={() => setShowCompanionPicker(true)}
                   >
                     <Text className='btn-icon'>🧙</Text>
                     <Text>召唤伙伴</Text>
                   </Button>
                 )}
-                <Button 
-                  className='add-random-btn' 
-                  size='mini' 
+                {/* 如果选择了共享事件，显示邀请巫师按钮 */}
+                {selectedSubLedgerId && subLedgers.find(sl => sl._id === selectedSubLedgerId)?.cloudId && (
+                  <Button
+                    className='add-random-btn'
+                    size='mini'
+                    onClick={() => handleShowInvite()}
+                  >
+                    <Text className='btn-icon'>📜</Text>
+                    <Text>邀请巫师</Text>
+                  </Button>
+                )}
+                <Button
+                  className='add-random-btn'
+                  size='mini'
                   onClick={() => setShowSimpleAddForm(true)}
                 >
                   <Text className='btn-icon'>✏️</Text>
@@ -1786,11 +1853,15 @@ export default function Index() {
                         className={`subledger-item ${isSelected ? 'selected' : ''}`}
                         onClick={(e) => { 
                           e.stopPropagation(); 
-                          console.log('Selected subledger:', sl._id, sl.name);
+                          console.log('Selected subledger:', sl._id, sl.name, 'cloudId:', sl.cloudId);
                           setSelectedSubLedgerId(sl._id); 
+                          // 如果有cloudId，自动获取云端参与者
+                          if (sl.cloudId) {
+                            handleSelectCloudEvent(sl.cloudId)
+                          }
                         }}
                       >
-                        <View className='subledger-icon'>📜</View>
+                        <View className='subledger-icon'>{sl.cloudId ? '📜' : '📋'}</View>
                         <View className='subledger-info'>
                           <Text className='subledger-name'>{sl.name}</Text>
                           <Text className='subledger-amount'>¥{(sl.totalAmount / 100).toFixed(2)}</Text>
@@ -1800,6 +1871,17 @@ export default function Index() {
                     )
                   })}
                 </View>
+
+                {/* 加入共享事件入口 */}
+                <View className='join-contract-entry' onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSubLedgerPicker(false);
+                  handleShowJoinContract();
+                }}>
+                  <Text className='join-icon'>➕</Text>
+                  <Text className='join-text'>加入共享事件</Text>
+                </View>
+
                 <View className='picker-footer'>
                   <Button className='confirm-add-btn' onClick={(e) => { e.stopPropagation(); handleLinkToSubLedger(); }}>
                     确认入账
@@ -1811,67 +1893,41 @@ export default function Index() {
         </View>
       )}
 
-      {/* 契约选择弹窗 */}
-      {showContractPicker && (
-        <View className='contract-picker-mask' onClick={() => setShowContractPicker(false)}>
-          <View className='contract-picker' onClick={(e) => e.stopPropagation()}>
-            <View className='picker-header'>
-              <Text className='picker-title'>选择记账方式</Text>
-              <View className='picker-close' onClick={() => setShowContractPicker(false)}>
-                <Text className='close-icon'>✕</Text>
-              </View>
+      {/* 邀请巫师弹窗 */}
+      {showInviteModal && (
+        <View className='modal-mask' onClick={() => setShowInviteModal(false)}>
+          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
+            <Text className='modal-title'>📜 邀请巫师</Text>
+            <Text className='modal-hint'>分享邀请码，好友加入后即可共同记账</Text>
+            <View className='invite-code-box'>
+              <Text className='invite-code'>{inviteCode}</Text>
             </View>
-
-            {/* 本地记账选项 */}
-            <View
-              className={`contract-option ${selectedContractId === '' ? 'selected' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation()
-                handleSelectContract('')
-              }}
-            >
-              <Text className='option-icon'>📋</Text>
-              <View className='option-info'>
-                <Text className='option-name'>本地记账</Text>
-                <Text className='option-hint'>仅本地保存，不同步到云端</Text>
-              </View>
-              {selectedContractId === '' && <Text className='check-icon'>✓</Text>}
+            <View className='modal-actions'>
+              <View className='modal-cancel' onClick={(e) => { e.stopPropagation(); setShowInviteModal(false); }}>关闭</View>
+              <View className='modal-confirm' onClick={(e) => { e.stopPropagation(); handleCopyInviteCode(); }}>复制邀请码</View>
             </View>
+          </View>
+        </View>
+      )}
 
-            {/* 契约列表 */}
-            {contracts.length > 0 && (
-              <>
-                <View className='picker-divider'>
-                  <Text className='divider-text'>契约账本</Text>
-                </View>
-                <View className='contract-picker-list'>
-                  {contracts.map((contract) => (
-                    <View
-                      key={contract._id}
-                      className={`contract-option ${selectedContractId === contract._id ? 'selected' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleSelectContract(contract._id)
-                      }}
-                    >
-                      <Text className='option-icon'>📜</Text>
-                      <View className='option-info'>
-                        <Text className='option-name'>{contract.name}</Text>
-                        <Text className='option-hint'>{contract.memberCount || contract.members?.length || 0} 位巫师</Text>
-                      </View>
-                      {selectedContractId === contract._id && <Text className='check-icon'>✓</Text>}
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-
-            {contracts.length === 0 && (
-              <View className='picker-empty'>
-                <Text className='empty-text'>还没有契约</Text>
-                <Text className='empty-hint'>可以在契约页面创建或加入契约</Text>
-              </View>
-            )}
+      {/* 加入契约弹窗 */}
+      {showJoinModal && (
+        <View className='modal-mask' onClick={() => setShowJoinModal(false)}>
+          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
+            <Text className='modal-title'>📜 加入共享事件</Text>
+            <Text className='modal-hint'>输入好友发来的邀请码，即可加入共享记账</Text>
+            <Input
+              className='modal-input'
+              value={joinCode}
+              onInput={(e) => setJoinCode(e.detail.value)}
+              placeholder='请输入6位邀请码'
+              maxlength={6}
+              style={{ textTransform: 'uppercase', letterSpacing: 4, textAlign: 'center' as const }}
+            />
+            <View className='modal-actions'>
+              <Text className='modal-cancel' onClick={() => setShowJoinModal(false)}>取消</Text>
+              <Text className='modal-confirm' onClick={handleJoinContract}>{joinLoading ? '加入中...' : '确认加入'}</Text>
+            </View>
           </View>
         </View>
       )}

@@ -1968,3 +1968,20 @@ $dark-purple: #1a0f0a;
   font-size: 28rpx;
   color: $magic-gold;
 }
+
+// 邀请码框
+.invite-code-box {
+  background: rgba($magic-gold, 0.1);
+  border: 2rpx solid rgba($magic-gold, 0.3);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 30rpx 0;
+  text-align: center;
+}
+
+.invite-code {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  letter-spacing: 8rpx;
+}
