@@ -699,3 +699,57 @@ $ink: #2c1e1a;
   word-break: break-all;
   font-family: monospace;
 }
+
+// 添加方式选择弹窗
+.add-picker-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin: 30rpx 0;
+}
+
+.add-picker-btn {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background: rgba($magic-gold, 0.08);
+  border: 2rpx solid rgba($magic-gold, 0.2);
+  border-radius: 16rpx;
+
+  &:active {
+    background: rgba($magic-gold, 0.15);
+  }
+}
+
+.picker-icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+
+.picker-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.picker-title {
+  font-size: 30rpx;
+  color: $magic-gold;
+  font-weight: bold;
+}
+
+.picker-desc {
+  font-size: 24rpx;
+  color: rgba($magic-gold, 0.6);
+}
+
+.modal-close-hint {
+  text-align: center;
+  padding: 20rpx;
+  margin-top: 20rpx;
+}
+
+.close-hint-text {
+  font-size: 28rpx;
+  color: rgba($parchment, 0.6);
+}

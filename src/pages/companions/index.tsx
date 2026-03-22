@@ -11,12 +11,15 @@ import { cloudLogin, createContract } from '@/services/cloud'
 import './index.scss'
 
 export default function CompanionsPage() {
-  const { user, isLogged } = useUser()
+  const { user, isLogged, userCompanion } = useUser()
   const [companions, setCompanions] = useState<WizardCompanion[]>([])
-  const [isAdding, setIsAdding] = useState(false)
   const [newName, setNewName] = useState('')
   const [selectedAvatar, setSelectedAvatar] = useState('')
   const [showLoginModal, setShowLoginModal] = useState(false)
+  
+  // 添加方式选择弹窗
+  const [showAddPicker, setShowAddPicker] = useState(false)
+  const [showAddForm, setShowAddForm] = useState(false)
   
   // 编辑头像
   const [editingCompanion, setEditingCompanion] = useState<WizardCompanion | null>(null)
@@ -129,8 +132,55 @@ export default function CompanionsPage() {
     setCompanions(getCompanions())
     setNewName('')
     setSelectedAvatar('')
-    setIsAdding(false)
+    setShowAddForm(false)
     Taro.showToast({ title: '伙伴已加入！', icon: 'success' })
+  }
+
+  // 邀请微信好友成为伙伴
+  const handleInviteWechatFriend = async () => {
+    if (!isLogged) {
+      Taro.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+
+    try {
+      const loginResult = await cloudLogin(
+        userCompanion?.name || '神秘巫师',
+        userCompanion?.avatar || ''
+      )
+      if (!loginResult.success || !loginResult.data) {
+        Taro.showToast({ title: '登录失败', icon: 'none' })
+        return
+      }
+
+      // 创建临时契约来获取邀请链接
+      const contractResult = await createContract('邀请好友')
+      if (contractResult.success && contractResult.data?.contract) {
+        const newInviteCode = contractResult.data.contract.inviteCode || ''
+        
+        if (newInviteCode) {
+          const shareLink = `magic-bill://join?code=${newInviteCode}`
+          Taro.setClipboardData({
+            data: shareLink,
+            success: () => {
+              Taro.showModal({
+                title: '邀请链接已复制',
+                content: `链接已复制到剪贴板！发送给微信好友，好友点击加入后即可成为记账伙伴，共同管理账单。`,
+                showCancel: false,
+                confirmText: '知道了'
+              })
+            }
+          })
+        }
+      } else {
+        Taro.showToast({ title: '获取邀请链接失败', icon: 'none' })
+      }
+    } catch (e) {
+      console.error('[Invite] 邀请失败', e)
+      Taro.showToast({ title: '邀请失败', icon: 'none' })
+    }
+    
+    setShowAddPicker(false)
   }
 
   const handleDelete = (companion: WizardCompanion) => {
@@ -255,14 +305,46 @@ export default function CompanionsPage() {
       </View>
 
       {/* 添加按钮 */}
-      {!isAdding && (
-        <View className='add-companion-btn' onClick={() => setIsAdding(true)}>
-          <Text className='add-icon'>+ 添加新伙伴</Text>
+      <View className='add-companion-btn' onClick={() => setShowAddPicker(true)}>
+        <Text className='add-icon'>+ 添加新伙伴</Text>
+      </View>
+
+      {/* 添加方式选择弹窗 */}
+      {showAddPicker && (
+        <View className='modal-mask' onClick={() => setShowAddPicker(false)}>
+          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
+            <Text className='modal-title'>🧙 添加伙伴</Text>
+            <Text className='modal-hint'>选择添加方式</Text>
+
+            <View className='add-picker-actions'>
+              {/* 添加自定义巫师 */}
+              <View className='add-picker-btn' onClick={() => { setShowAddPicker(false); setShowAddForm(true); }}>
+                <Text className='picker-icon'>🧙</Text>
+                <View className='picker-text'>
+                  <Text className='picker-title'>自定义巫师</Text>
+                  <Text className='picker-desc'>创建虚拟伙伴，仅自己可见</Text>
+                </View>
+              </View>
+
+              {/* 邀请微信好友 */}
+              <View className='add-picker-btn' onClick={handleInviteWechatFriend}>
+                <Text className='picker-icon'>📱</Text>
+                <View className='picker-text'>
+                  <Text className='picker-title'>邀请微信好友</Text>
+                  <Text className='picker-desc'>好友点击链接即可加入，可共同管理账单</Text>
+                </View>
+              </View>
+            </View>
+
+            <View className='modal-close-hint' onClick={() => setShowAddPicker(false)}>
+              <Text className='close-hint-text'>取消</Text>
+            </View>
+          </View>
         </View>
       )}
 
-      {/* 添加表单 */}
-      {isAdding && (
+      {/* 添加自定义巫师表单 */}
+      {showAddForm && (
         <View className='add-form'>
           <View className='form-title'>创建巫师伙伴</View>
           
@@ -296,7 +378,7 @@ export default function CompanionsPage() {
 
           <View className='form-actions'>
             <Text className='cancel-btn' onClick={() => {
-              setIsAdding(false)
+              setShowAddForm(false)
               setNewName('')
               setSelectedAvatar('')
             }}>取消</Text>
