@@ -310,15 +310,13 @@ export default function LedgerPage() {
 
     // 先确保登录（获取用户信息）
     const loginResult = await cloudLogin()
-    const { userCompanion } = require('@/contexts/UserContext').useUserContext()
-    const currentUserCompanion = userCompanion?.()
 
     // 创建本地事件，创建者作为第一个成员
     const newSubLedger = createSubLedger(
       newSubLedgerName.trim(),
       loginResult.data?.userId,
-      currentUserCompanion?.name || '创建者',
-      currentUserCompanion?.avatar || '🧙'
+      userCompanion?.name || '创建者',
+      userCompanion?.avatar || '🧙'
     )
 
     setShowCreateModal(false)
