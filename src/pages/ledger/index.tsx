@@ -32,7 +32,7 @@ import { useUser } from '@/contexts/UserContext'
 import './index.scss'
 
 export default function LedgerPage() {
-  const { user, isLogged } = useUser()
+  const { user, isLogged, userCompanion } = useUser()
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [subLedgers, setSubLedgers] = useState<SubLedger[]>([])
   const [selectedSubLedger, setSelectedSubLedger] = useState<SubLedger | null>(null)
