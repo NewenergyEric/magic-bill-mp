@@ -229,9 +229,9 @@ export default function Index() {
     const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
     if (!currentSubLedger) return
 
-    // 如果还没有cloudId，先创建云端契约
-    if (!currentSubLedger.cloudId) {
-      try {
+    try {
+      // 如果还没有cloudId，先创建云端契约
+      if (!currentSubLedger.cloudId) {
         const loginResult = await cloudLogin(
           userCompanion?.name || '神秘巫师',
           userCompanion?.avatar || ''
@@ -246,28 +246,70 @@ export default function Index() {
           // 更新本地事件的cloudId
           const { updateSubLedger } = require('@/services/ledger')
           updateSubLedger(currentSubLedger._id, { cloudId: contractResult.data.contract._id })
-          setInviteCode(contractResult.data.contract.inviteCode || '')
+          const newInviteCode = contractResult.data.contract.inviteCode || ''
+          setInviteCode(newInviteCode)
           setSubLedgers(getActiveSubLedgers())
-          Taro.showToast({ title: '已开启云端共享', icon: 'success' })
+          
+          // 直接复制链接并提示用户分享
+          if (newInviteCode) {
+            const shareLink = `magic-bill://join?code=${newInviteCode}`
+            Taro.setClipboardData({
+              data: shareLink,
+              success: () => {
+                Taro.showModal({
+                  title: '邀请链接已复制',
+                  content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可邀请加入「${currentSubLedger.name}」`,
+                  showCancel: false,
+                  confirmText: '知道了'
+                })
+              }
+            })
+          }
         } else {
           Taro.showToast({ title: '开启共享失败', icon: 'none' })
-          return
         }
-      } catch (e) {
-        console.error('[Invite] 创建云端契约失败', e)
-        Taro.showToast({ title: '开启共享失败', icon: 'none' })
-        return
-      }
-    } else {
-      // 已有cloudId，获取邀请码
-      try {
-        const res = await getContractDetail(currentSubLedger.cloudId)
-        if (res.success && res.data?.contract) {
-          setInviteCode(res.data.contract.inviteCode || '')
+      } else {
+        // 已有cloudId，获取邀请码并生成链接
+        let codeToUse = inviteCode
+        if (!codeToUse) {
+          const res = await getContractDetail(currentSubLedger.cloudId)
+          if (res.success && res.data?.contract?.inviteCode) {
+            codeToUse = res.data.contract.inviteCode
+            setInviteCode(codeToUse)
+          }
         }
-      } catch (e) {
-        console.error('[Invite] 获取邀请码失败', e)
+        
+        if (codeToUse) {
+          const shareLink = `magic-bill://join?code=${codeToUse}`
+          Taro.setClipboardData({
+            data: shareLink,
+            success: () => {
+              Taro.showModal({
+                title: '邀请链接已复制',
+                content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可邀请加入「${currentSubLedger.name}」`,
+                showCancel: false,
+                confirmText: '知道了'
+              })
+            }
+          })
+        }
       }
+    } catch (e) {
+      console.error('[Invite] 创建云端契约失败', e)
+      Taro.showToast({ title: '邀请失败', icon: 'none' })
+    }
+  }
+
+  // 复制邀请链接
+  const handleCopyInviteLink = () => {
+    if (inviteCode) {
+      const shareLink = `magic-bill://join?code=${inviteCode}`
+      Taro.setClipboardData({
+        data: shareLink,
+        success: () => {
+          Taro.showToast({ title: '邀请链接已复制', icon: 'success' })
+        }
+      })
     }
   }
 
@@ -346,10 +388,11 @@ export default function Index() {
 
   const handleCopyInviteCode = () => {
     if (inviteCode) {
+      const shareLink = `magic-bill://join?code=${inviteCode}`
       Taro.setClipboardData({
-        data: inviteCode,
+        data: shareLink,
         success: () => {
-          Taro.showToast({ title: '邀请码已复制', icon: 'success' })
+          Taro.showToast({ title: '邀请链接已复制', icon: 'success' })
         }
       })
     }
@@ -2062,15 +2105,15 @@ export default function Index() {
                   </View>
                 </View>
 
-                {/* 如果有邀请码，显示邀请码 */}
+                {/* 如果有邀请码，显示邀请链接 */}
                 {inviteCode && (
-                  <View className='invite-code-section'>
-                    <Text className='section-label'>邀请码</Text>
-                    <View className='invite-code-box'>
-                      <Text className='invite-code'>{inviteCode}</Text>
+                  <View className='invite-link-section'>
+                    <Text className='section-label'>邀请链接</Text>
+                    <View className='invite-link-box'>
+                      <Text className='invite-link'>magic-bill://join?code={inviteCode}</Text>
                     </View>
                     <View className='copy-btn' onClick={handleCopyInviteCode}>
-                      <Text className='copy-btn-text'>复制邀请码</Text>
+                      <Text className='copy-btn-text'>复制链接</Text>
                     </View>
                   </View>
                 )}

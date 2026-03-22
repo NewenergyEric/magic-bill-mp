@@ -66,7 +66,9 @@ export default function LedgerPage() {
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [currentInviteCode, setCurrentInviteCode] = useState('')
   const [currentInviteName, setCurrentInviteName] = useState('')
-  const [inviteMode, setInviteMode] = useState<'new' | 'existing'>('existing') // new=新建后邀请, existing=已有事件邀请
+  const [inviteMode, setInviteMode] = useState<'new' | 'existing'>('existing')
+  const [inviteLink, setInviteLink] = useState('')
+  const [creatingContract, setCreatingContract] = useState(false)
 
   // 添加自定义巫师相关
   const [showAddWizard, setShowAddWizard] = useState(false)
@@ -111,10 +113,12 @@ export default function LedgerPage() {
     setShowInviteModal(false)
     setCurrentInviteSubLedger(null)
     setCurrentInviteCode('')
+    setInviteLink('')
     setShowAddWizard(false)
     setNewWizardName('')
     setNewWizardAvatar('')
     setInviteTargetMember(null)
+    setCreatingContract(false)
   }
 
   // 添加自定义巫师到事件
@@ -151,17 +155,19 @@ export default function LedgerPage() {
     loadData()
   }
 
-  // 发送微信邀请（自动创建云端契约）
+  // 发送微信邀请（自动创建云端契约并直接分享）
   const handleSendInvite = async () => {
     const subLedger = currentInviteSubLedger
     if (!subLedger) return
 
-    // 如果还没有cloudId，先创建云端契约
-    if (!subLedger.cloudId) {
-      try {
+    setCreatingContract(true)
+    try {
+      // 如果还没有cloudId，先创建云端契约
+      if (!subLedger.cloudId) {
         const loginResult = await cloudLogin()
         if (!loginResult.success || !loginResult.data) {
           Taro.showToast({ title: '请先登录', icon: 'none' })
+          setCreatingContract(false)
           return
         }
 
@@ -173,38 +179,68 @@ export default function LedgerPage() {
           setCurrentInviteCode(contractResult.data.contract.inviteCode || '')
           Taro.showToast({ title: '已开启云端共享', icon: 'success' })
           loadData()
+          
+          // 直接复制链接并提示用户分享
+          const inviteCode = contractResult.data.contract.inviteCode
+          if (inviteCode) {
+            const shareLink = `magic-bill://join?code=${inviteCode}`
+            Taro.setClipboardData({
+              data: shareLink,
+              success: () => {
+                Taro.showModal({
+                  title: '邀请链接已复制',
+                  content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可邀请加入「${subLedger.name}」`,
+                  showCancel: false,
+                  confirmText: '知道了'
+                })
+              }
+            })
+          }
         } else {
           Taro.showToast({ title: '开启共享失败', icon: 'none' })
-          return
         }
-      } catch (e) {
-        console.error('[Invite] 创建云端契约失败', e)
-        Taro.showToast({ title: '开启共享失败', icon: 'none' })
-        return
-      }
-    }
-
-    // 显示邀请码
-    if (!currentInviteCode) {
-      // 如果没有邀请码，获取一个
-      try {
-        const res = await getContractDetail(subLedger.cloudId!)
-        if (res.success && res.data?.contract) {
-          setCurrentInviteCode(res.data.contract.inviteCode || '')
+      } else {
+        // 已有cloudId，获取邀请码并生成链接
+        let inviteCode = currentInviteCode
+        if (!inviteCode) {
+          const res = await getContractDetail(subLedger.cloudId)
+          if (res.success && res.data?.contract) {
+            inviteCode = res.data.contract.inviteCode || ''
+            setCurrentInviteCode(inviteCode)
+          }
         }
-      } catch (e) {
-        console.error('[Invite] 获取邀请码失败', e)
+        
+        if (inviteCode) {
+          const shareLink = `magic-bill://join?code=${inviteCode}`
+          Taro.setClipboardData({
+            data: shareLink,
+            success: () => {
+              Taro.showModal({
+                title: '邀请链接已复制',
+                content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可邀请加入「${subLedger.name}」`,
+                showCancel: false,
+                confirmText: '知道了'
+              })
+            }
+          })
+        }
       }
+    } catch (e) {
+      console.error('[Invite] 创建云端契约失败', e)
+      Taro.showToast({ title: '邀请失败', icon: 'none' })
+    } finally {
+      setCreatingContract(false)
     }
   }
 
-  // 复制邀请码
-  const handleCopyInviteCode = () => {
+  // 复制邀请链接
+  const handleCopyInviteLink = () => {
     if (currentInviteCode) {
+      const shareLink = `magic-bill://join?code=${currentInviteCode}`
       Taro.setClipboardData({
-        data: currentInviteCode,
+        data: shareLink,
         success: () => {
-          Taro.showToast({ title: '邀请码已复制', icon: 'success' })
+          Taro.showToast({ title: '邀请链接已复制', icon: 'success' })
         }
       })
     }
@@ -1232,21 +1268,21 @@ export default function LedgerPage() {
                   </View>
 
                   {/* 发送微信邀请按钮 */}
-                  <View className='invite-action-btn' onClick={handleSendInvite}>
+                  <View className={`invite-action-btn ${creatingContract ? 'disabled' : ''}`} onClick={creatingContract ? undefined : handleSendInvite}>
                     <Text className='action-icon'>📱</Text>
-                    <Text className='action-text'>发送微信邀请</Text>
+                    <Text className='action-text'>{creatingContract ? '创建中...' : '发送微信邀请'}</Text>
                   </View>
                 </View>
 
-                {/* 如果有邀请码，显示邀请码 */}
+                {/* 如果已有邀请码，显示邀请链接 */}
                 {currentInviteCode && (
-                  <View className='invite-code-section'>
-                    <Text className='section-label'>邀请码</Text>
-                    <View className='invite-code-box'>
-                      <Text className='invite-code'>{currentInviteCode}</Text>
+                  <View className='invite-link-section'>
+                    <Text className='section-label'>邀请链接</Text>
+                    <View className='invite-link-box'>
+                      <Text className='invite-link'>magic-bill://join?code={currentInviteCode}</Text>
                     </View>
-                    <View className='copy-btn' onClick={handleCopyInviteCode}>
-                      <Text className='copy-btn-text'>复制邀请码</Text>
+                    <View className='copy-btn' onClick={handleCopyInviteLink}>
+                      <Text className='copy-btn-text'>复制链接</Text>
                     </View>
                   </View>
                 )}

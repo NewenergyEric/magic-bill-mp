@@ -682,3 +682,20 @@ $ink: #2c1e1a;
   color: $magic-gold;
   letter-spacing: 8rpx;
 }
+
+// 邀请链接框
+.invite-link-box {
+  background: rgba($magic-gold, 0.1);
+  border: 2rpx dashed rgba($magic-gold, 0.3);
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin: 30rpx 0;
+  overflow: hidden;
+}
+
+.invite-link {
+  font-size: 24rpx;
+  color: $parchment;
+  word-break: break-all;
+  font-family: monospace;
+}

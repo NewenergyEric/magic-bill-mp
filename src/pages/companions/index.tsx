@@ -57,8 +57,24 @@ export default function CompanionsPage() {
       // 创建契约获取邀请码
       const contractResult = await createContract(`邀请-${companion.name}`)
       if (contractResult.success && contractResult.data?.contract) {
-        setInviteCode(contractResult.data.contract.inviteCode || '')
-        setShowInviteModal(true)
+        const newInviteCode = contractResult.data.contract.inviteCode || ''
+        setInviteCode(newInviteCode)
+        
+        // 直接复制链接并提示用户分享
+        if (newInviteCode) {
+          const shareLink = `magic-bill://join?code=${newInviteCode}`
+          Taro.setClipboardData({
+            data: shareLink,
+            success: () => {
+              Taro.showModal({
+                title: '邀请链接已复制',
+                content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可将「${companion.name}」关联到真实用户`,
+                showCancel: false,
+                confirmText: '知道了'
+              })
+            }
+          })
+        }
       } else {
         Taro.showToast({ title: '获取邀请码失败', icon: 'none' })
       }
@@ -68,13 +84,14 @@ export default function CompanionsPage() {
     }
   }
 
-  // 复制邀请码
-  const handleCopyInviteCode = () => {
+  // 复制邀请链接
+  const handleCopyInviteLink = () => {
     if (inviteCode) {
+      const shareLink = `magic-bill://join?code=${inviteCode}`
       Taro.setClipboardData({
-        data: inviteCode,
+        data: shareLink,
         success: () => {
-          Taro.showToast({ title: '邀请码已复制', icon: 'success' })
+          Taro.showToast({ title: '邀请链接已复制', icon: 'success' })
         }
       })
     }
@@ -447,13 +464,15 @@ export default function CompanionsPage() {
         <View className='modal-mask' onClick={() => closeInviteModal()}>
           <View className='modal-content' onClick={(e) => e.stopPropagation()}>
             <Text className='modal-title'>📱 邀请「{invitingCompanion?.name}」升级为微信用户</Text>
-            <Text className='modal-hint'>分享邀请码，好友加入后该巫师将变为微信用户</Text>
-            <View className='invite-code-box'>
-              <Text className='invite-code'>{inviteCode}</Text>
-            </View>
+            <Text className='modal-hint'>邀请链接已复制，发送给微信好友即可关联</Text>
+            {inviteCode && (
+              <View className='invite-link-box'>
+                <Text className='invite-link'>magic-bill://join?code={inviteCode}</Text>
+              </View>
+            )}
             <View className='modal-actions'>
               <Text className='modal-cancel' onClick={() => closeInviteModal()}>关闭</Text>
-              <Text className='modal-confirm' onClick={() => handleCopyInviteCode()}>复制邀请码</Text>
+              <Text className='modal-confirm' onClick={() => handleCopyInviteLink()}>复制链接</Text>
             </View>
           </View>
         </View>
