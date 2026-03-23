@@ -584,21 +584,6 @@ export default function Index() {
       return
     }
 
-    // 检查是否选择了事件
-    if (!selectedSubLedgerId) {
-      Taro.showModal({
-        title: '请选择事件',
-        content: '记账前需要选择一个事件，是否现在选择？',
-        confirmText: '去选择',
-        success: (res) => {
-          if (res.confirm) {
-            setShowSubLedgerPicker(true)
-          }
-        }
-      })
-      return
-    }
-
     // 显示动画
     setIsCalculating(true)
 
@@ -623,61 +608,18 @@ export default function Index() {
     const bill: Omit<Bill, '_id' | 'userId'> = {
       type: 'simple',
       eventName,
-      totalAmount: aInCents,  // 单位：分
+      totalAmount: aInCents,
       participantsCount: wizards.length,
       date: Date.now(),
       details: {
         participants: participantsWithPaid,
         settlements: [],
         payerId: actualPayerId
-      },
-      subLedgerId: selectedSubLedgerId  // 直接关联事件
+      }
     }
 
     // 保存账单
     let savedBill = saveBillToLedger(bill)
-
-    // 关联账单到事件
-    linkBillToSubLedger(savedBill._id, selectedSubLedgerId)
-
-    // 如果选择了有cloudId的事件，同时创建云端账单
-    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
-    if (currentSubLedger?.cloudId) {
-      try {
-        // 构建云端账单参与者
-        const cloudParticipants = participantsWithPaid.map(w => ({
-          userId: w.id,
-          name: w.name,
-          avatar: w.avatar || '',
-          paid: w.paid,
-          consumed: perPersonInCents
-        }))
-
-        // 调用云端创建账单
-        const cloudRes = await createCloudBill({
-          contractId: currentSubLedger.cloudId,
-          eventName,
-          spellType: 'simple',
-          totalAmount: aInCents,
-          avgInCents: perPersonInCents,
-          participants: cloudParticipants
-        })
-
-        if (cloudRes.success && cloudRes.data?.bill?._id) {
-          // 更新本地账单，标记为已同步
-          savedBill = saveBillToLedger({
-            ...savedBill,
-            cloudId: cloudRes.data.bill._id,
-            contractId: currentSubLedger.cloudId
-          })
-          console.log('[Contract] 云端账单创建成功', cloudRes.data)
-        } else {
-          console.log('[Contract] 云端账单创建失败', cloudRes.message)
-        }
-      } catch (e) {
-        console.log('[Contract] 创建云端账单异常', e)
-      }
-    }
 
     setIsCalculating(false)
     setResultData({
@@ -1068,21 +1010,6 @@ export default function Index() {
       return
     }
 
-    // 检查是否选择了事件
-    if (!selectedSubLedgerId) {
-      Taro.showModal({
-        title: '请选择事件',
-        content: '记账前需要选择一个事件，是否现在选择？',
-        confirmText: '去选择',
-        success: (res) => {
-          if (res.confirm) {
-            setShowSubLedgerPicker(true)
-          }
-        }
-      })
-      return
-    }
-
     setIsCalculating(true)
     await new Promise(resolve => setTimeout(resolve, 1500))
 
@@ -1110,51 +1037,13 @@ export default function Index() {
     const bill: Omit<Bill, '_id' | 'userId'> = {
       type: 'multi',
       eventName,
-      totalAmount: totalInCents,  // 单位：分
+      totalAmount: totalInCents,
       participantsCount: multiWizards.length,
       date: Date.now(),
-      details: { participants: multiWizards, settlements },
-      subLedgerId: selectedSubLedgerId  // 直接关联事件
+      details: { participants: multiWizards, settlements }
     }
 
     const savedBill = saveBillToLedger(bill)
-
-    // 关联账单到事件
-    linkBillToSubLedger(savedBill._id, selectedSubLedgerId)
-
-    // 如果选择了有cloudId的事件，同时创建云端账单
-    const currentSubLedger = subLedgers.find(sl => sl._id === selectedSubLedgerId)
-    if (currentSubLedger?.cloudId) {
-      try {
-        const cloudParticipants = multiWizards.map(w => ({
-          userId: w.id,
-          name: w.name,
-          avatar: w.avatar || '',
-          paid: w.paid,
-          consumed: avgInCents
-        }))
-
-        const cloudRes = await createCloudBill({
-          contractId: currentSubLedger.cloudId,
-          eventName,
-          spellType: 'multi',
-          totalAmount: totalInCents,
-          avgInCents,
-          participants: cloudParticipants
-        })
-
-        if (cloudRes.success && cloudRes.data?.bill?._id) {
-          saveBillToLedger({
-            ...savedBill,
-            cloudId: cloudRes.data.bill._id,
-            contractId: currentSubLedger.cloudId
-          })
-          console.log('[Contract] 云端账单创建成功', cloudRes.data)
-        }
-      } catch (e) {
-        console.log('[Contract] 创建云端账单异常', e)
-      }
-    }
 
     setIsCalculating(false)
     setMultiResultData({ eventName, total: totalInCents, settlements, billId: savedBill._id })
@@ -1327,20 +1216,7 @@ export default function Index() {
         </View>
       </View>
 
-      {/* 事件选择器 */}
-      <View className='contract-selector' onClick={() => setShowSubLedgerPicker(true)}>
-        <Text className='selector-icon'>
-          {selectedSubLedgerId && subLedgers.find(sl => sl._id === selectedSubLedgerId)?.cloudId ? '📜' : '📋'}
-        </Text>
-        <Text className='selector-text'>
-          {selectedSubLedgerId
-            ? subLedgers.find(sl => sl._id === selectedSubLedgerId)?.name || '选择事件'
-            : '选择事件'}
-        </Text>
-        <Text className='selector-arrow'>▼</Text>
-      </View>
-
-      {/* Main Content */}
+      {/* 主内容 */}
       <View className='main-content'>
         {/* 均分咒 */}
         {activeTab === 'simple' && (
@@ -1367,37 +1243,16 @@ export default function Index() {
             {/* 添加巫师按钮 */}
             <View className='form-section'>
               <Text className='form-label'>参与巫师 ({wizards.length})</Text>
-              
-              {/* 如果选择了事件且有成员 */}
-              {selectedSubLedgerId && currentEventMembers.length > 0 ? (
-                <View className='add-buttons'>
-                  <Button
-                    className='add-companion-btn'
-                    size='mini'
-                    onClick={() => setShowMemberPicker(true)}
-                  >
-                    <Text className='btn-icon'>🧙</Text>
-                    <Text>选择成员</Text>
-                  </Button>
-                </View>
-              ) : selectedSubLedgerId && currentEventMembers.length === 0 ? (
-                /* 如果选择了事件但没有成员 */
-                <View className='no-members-hint'>
-                  <Text className='hint-text'>该事件暂无成员，请先去古灵阁添加成员</Text>
-                  <Button
-                    className='go-add-btn'
-                    size='mini'
-                    onClick={() => Taro.switchTab({ url: '/pages/ledger/index' })}
-                  >
-                    去添加
-                  </Button>
-                </View>
-              ) : (
-                /* 如果没有选择事件 */
-                <View className='no-event-hint' onClick={() => setShowSubLedgerPicker(true)}>
-                  <Text className='hint-text'>👆 请先选择一个事件</Text>
-                </View>
-              )}
+              <View className='add-buttons'>
+                <Button
+                  className='add-companion-btn'
+                  size='mini'
+                  onClick={() => setShowCompanionPicker(true)}
+                >
+                  <Text className='btn-icon'>🧙</Text>
+                  <Text>添加巫师</Text>
+                </Button>
+              </View>
             </View>
 
             {/* 巫师列表 */}
@@ -1976,81 +1831,6 @@ export default function Index() {
               <Text className='edit-cancel' onClick={() => setShowEditEvent(false)}>取消</Text>
               <Text className='edit-confirm' onClick={confirmEditEvent}>确认</Text>
             </View>
-          </View>
-        </View>
-      )}
-
-      {/* 子收支录选择弹窗 */}
-      {showSubLedgerPicker && (
-        <View className='subledger-mask' onClick={() => setShowSubLedgerPicker(false)}>
-          <View className='subledger-picker' onClick={(e) => e.stopPropagation()}>
-            <View className='picker-header'>
-              <Text className='picker-title'>选择记账事件</Text>
-              <View className='picker-close' onClick={() => setShowSubLedgerPicker(false)}>
-                <Text className='close-icon'>✕</Text>
-              </View>
-            </View>
-            
-            {/* 新建事件按钮 */}
-            <View className='create-event-btn' onClick={(e) => { e.stopPropagation(); openCreateEvent(); }}>
-              <Text className='create-icon'>+</Text>
-              <Text className='create-text'>新建事件</Text>
-            </View>
-            
-            {subLedgers.length === 0 ? (
-              <View className='picker-empty'>
-                <Text className='empty-text'>还没有记账事件</Text>
-                <Text className='empty-hint'>点击上方按钮新建一个</Text>
-              </View>
-            ) : (
-              <>
-                <View className='subledger-picker-list'>
-                  {subLedgers.map((sl) => {
-                    const isSelected = selectedSubLedgerId === sl._id
-                    const memberCount = sl.members?.length || 0
-                    return (
-                      <View 
-                        key={sl._id} 
-                        className={`subledger-item ${isSelected ? 'selected' : ''}`}
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          setSelectedSubLedgerId(sl._id); 
-                          // 加载事件成员
-                          if (sl.cloudId) {
-                            handleSelectCloudEvent(sl.cloudId)
-                          } else {
-                            handleSelectLocalEvent(sl._id)
-                          }
-                        }}
-                      >
-                        <View className='subledger-icon'>{sl.cloudId ? '📜' : '📋'}</View>
-                        <View className='subledger-info'>
-                          <Text className='subledger-name'>{sl.name}</Text>
-                          <Text className='subledger-meta'>{memberCount}人 · ¥{(sl.totalAmount / 100).toFixed(2)}</Text>
-                        </View>
-                        {isSelected && <Text className='check-icon'>✓</Text>}
-                      </View>
-                    )
-                  })}
-                </View>
-
-                {/* 加入共享事件入口 */}
-                <View className='join-contract-entry' onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSubLedgerPicker(false);
-                  handleShowJoinContract();
-                }}>
-                  <Text className='join-icon'>➕</Text>
-                  <Text className='join-text'>加入共享事件</Text>
-                </View>
-
-                <View className='picker-footer'>
-                  <Button className='confirm-add-btn' onClick={(e) => { e.stopPropagation(); handleLinkToSubLedger(); }}>
-                    确认入账
-                  </Button>
-                </View>
-              </>
-            )}
           </View>
         </View>
       )}

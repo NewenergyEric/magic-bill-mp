@@ -44,8 +44,6 @@ export default function CompanionsPage() {
       return
     }
 
-    setInvitingCompanion(companion)
-
     // 创建临时契约来获取邀请码
     try {
       const loginResult = await cloudLogin(
@@ -61,21 +59,11 @@ export default function CompanionsPage() {
       const contractResult = await createContract(`邀请-${companion.name}`)
       if (contractResult.success && contractResult.data?.contract) {
         const newInviteCode = contractResult.data.contract.inviteCode || ''
-        setInviteCode(newInviteCode)
         
-        // 直接复制链接并提示用户分享
+        // 跳转到邀请页面
         if (newInviteCode) {
-          const shareLink = `magic-bill://join?code=${newInviteCode}`
-          Taro.setClipboardData({
-            data: shareLink,
-            success: () => {
-              Taro.showModal({
-                title: '邀请链接已复制',
-                content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可将「${companion.name}」关联到真实用户`,
-                showCancel: false,
-                confirmText: '知道了'
-              })
-            }
+          Taro.navigateTo({
+            url: `/pages/invite/index?code=${newInviteCode}&name=${encodeURIComponent('邀请-' + companion.name)}`
           })
         }
       } else {
@@ -159,17 +147,9 @@ export default function CompanionsPage() {
         const newInviteCode = contractResult.data.contract.inviteCode || ''
         
         if (newInviteCode) {
-          const shareLink = `magic-bill://join?code=${newInviteCode}`
-          Taro.setClipboardData({
-            data: shareLink,
-            success: () => {
-              Taro.showModal({
-                title: '邀请链接已复制',
-                content: `链接已复制到剪贴板！发送给微信好友，好友点击加入后即可成为记账伙伴，共同管理账单。`,
-                showCancel: false,
-                confirmText: '知道了'
-              })
-            }
+          // 跳转到邀请页面
+          Taro.navigateTo({
+            url: `/pages/invite/index?code=${newInviteCode}&name=${encodeURIComponent('好友邀请')}`
           })
         }
       } else {
@@ -539,25 +519,6 @@ export default function CompanionsPage() {
           type='companion'
           onComplete={() => setShowGuide(false)}
         />
-      )}
-
-      {/* 邀请弹窗 */}
-      {showInviteModal && (
-        <View className='modal-mask' onClick={() => closeInviteModal()}>
-          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <Text className='modal-title'>📱 邀请「{invitingCompanion?.name}」升级为微信用户</Text>
-            <Text className='modal-hint'>邀请链接已复制，发送给微信好友即可关联</Text>
-            {inviteCode && (
-              <View className='invite-link-box'>
-                <Text className='invite-link'>magic-bill://join?code={inviteCode}</Text>
-              </View>
-            )}
-            <View className='modal-actions'>
-              <Text className='modal-cancel' onClick={() => closeInviteModal()}>关闭</Text>
-              <Text className='modal-confirm' onClick={() => handleCopyInviteLink()}>复制链接</Text>
-            </View>
-          </View>
-        </View>
       )}
     </View>
   )
