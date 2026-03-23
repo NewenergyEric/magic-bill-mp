@@ -2315,3 +2315,47 @@ $dark-purple: #1a0f0a;
     opacity: 0.8;
   }
 }
+
+// 已添加成员横向显示
+.existing-members-inline {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding: 15rpx;
+  background: rgba($magic-gold, 0.05);
+  border-radius: 12rpx;
+}
+
+.inline-label {
+  font-size: 24rpx;
+  color: rgba($magic-gold, 0.7);
+  white-space: nowrap;
+  margin-right: 15rpx;
+}
+
+.members-scroll-x {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.member-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  margin-right: 10rpx;
+  background: rgba($magic-gold, 0.1);
+  border-radius: 20rpx;
+  vertical-align: middle;
+}
+
+.chip-name {
+  font-size: 24rpx;
+  color: $parchment;
+  margin-left: 8rpx;
+}
+
+// 头像滚动区域
+.avatar-scroll {
+  max-height: 400rpx;
+  margin: 15rpx 0;
+}

@@ -1,10 +1,16 @@
-import { View, Text, Button, Image } from '@tarojs/components'
+import { View, Text, Button, Image, ScrollView } from '@tarojs/components'
 import Taro, { useRouter, useShareAppMessage } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { cloudLogin, joinContract } from '@/services/cloud'
+import { cloudLogin, joinContract, getContractDetail } from '@/services/cloud'
 import { useUser } from '@/contexts/UserContext'
 import WizardAvatar from '@/components/WizardAvatar'
 import './index.scss'
+
+interface MemberInfo {
+  id: string
+  name: string
+  avatar?: string
+}
 
 export default function InvitePage() {
   const router = useRouter()
@@ -13,6 +19,7 @@ export default function InvitePage() {
   const [joined, setJoined] = useState(false)
   const [eventName, setEventName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
+  const [members, setMembers] = useState<MemberInfo[]>([])
 
   useEffect(() => {
     const { code, name } = router.params
@@ -21,8 +28,31 @@ export default function InvitePage() {
       if (name) {
         setEventName(decodeURIComponent(name))
       }
+      // 获取契约详情，显示成员
+      loadContractInfo(code)
     }
   }, [router.params])
+
+  const loadContractInfo = async (code: string) => {
+    try {
+      // 通过邀请码获取契约信息
+      const result = await getContractDetail(code)
+      if (result.success && result.data?.contract) {
+        const contract = result.data.contract
+        setEventName(contract.name || eventName)
+        // 设置成员列表
+        if (contract.members && Array.isArray(contract.members)) {
+          setMembers(contract.members.map((m: any) => ({
+            id: m.userId || m.id,
+            name: m.name || m.nickName || '巫师',
+            avatar: m.avatar || m.avatarUrl
+          })))
+        }
+      }
+    } catch (e) {
+      console.log('[Invite] 获取契约信息失败，可能还未创建', e)
+    }
+  }
 
   // 配置分享给朋友
   useShareAppMessage(() => {
@@ -97,6 +127,23 @@ export default function InvitePage() {
             <View className='event-name'>
               <Text className='name-label'>事件名称</Text>
               <Text className='name-text'>{eventName}</Text>
+            </View>
+          )}
+
+          {/* 已加入成员 */}
+          {members.length > 0 && (
+            <View className='members-preview'>
+              <Text className='preview-label'>已加入成员 ({members.length})</Text>
+              <ScrollView scrollX className='members-scroll'>
+                {members.map((member, idx) => (
+                  <View key={member.id || idx} className='member-preview-item'>
+                    <View className='member-avatar-small'>
+                      <WizardAvatar name={member.avatar || '🧙'} size='small' />
+                    </View>
+                    <Text className='member-name-small'>{member.name}</Text>
+                  </View>
+                ))}
+              </ScrollView>
             </View>
           )}
 

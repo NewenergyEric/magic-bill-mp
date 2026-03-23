@@ -197,10 +197,10 @@ export default function LedgerPage() {
         }
       }
 
-      // 跳转到分享页面
+      // 跳转到邀请页面
       if (inviteCode) {
         Taro.navigateTo({
-          url: `/pages/share/index?code=${inviteCode}&name=${encodeURIComponent(subLedger.name)}`
+          url: `/pages/invite/index?code=${inviteCode}&name=${encodeURIComponent(subLedger.name)}`
         })
       }
     } catch (e) {
@@ -1252,21 +1252,37 @@ export default function LedgerPage() {
               </>
             ) : (
               <>
-                {/* 添加巫师表单 */}
-                <Text className='modal-hint'>设置巫师头像和名字</Text>
+                {/* 添加巫师表单 - 先显示已添加成员 */}
+                {currentInviteSubLedger?.members && currentInviteSubLedger.members.length > 0 && (
+                  <View className='existing-members-inline'>
+                    <Text className='inline-label'>已添加：</Text>
+                    <ScrollView scrollX className='members-scroll-x'>
+                      {currentInviteSubLedger.members.map((member, idx) => (
+                        <View key={member.id || idx} className='member-chip'>
+                          <WizardAvatar name={member.avatar || '🧙'} size='small' />
+                          <Text className='chip-name'>{member.name}</Text>
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+                
+                <Text className='modal-hint'>选择头像和输入名字</Text>
                 
                 {/* 头像选择 */}
-                <View className='avatar-picker-grid'>
-                  {WIZARDS.map((w) => (
-                    <View
-                      key={w.avatar}
-                      className={`avatar-option-grid ${newWizardAvatar === w.avatar ? 'selected' : ''}`}
-                      onClick={() => setNewWizardAvatar(w.avatar)}
-                    >
-                      <WizardAvatar name={w.avatar} />
-                    </View>
-                  ))}
-                </View>
+                <ScrollView scrollY className='avatar-scroll'>
+                  <View className='avatar-picker-grid'>
+                    {WIZARDS.map((w) => (
+                      <View
+                        key={w.avatar}
+                        className={`avatar-option-grid ${newWizardAvatar === w.avatar ? 'selected' : ''}`}
+                        onClick={() => setNewWizardAvatar(w.avatar)}
+                      >
+                        <WizardAvatar name={w.avatar} />
+                      </View>
+                    ))}
+                  </View>
+                </ScrollView>
                 
                 {/* 名字输入 */}
                 <Input
@@ -1277,7 +1293,7 @@ export default function LedgerPage() {
                 />
                 
                 <View className='modal-actions'>
-                  <Text className='modal-cancel' onClick={() => { setShowAddWizard(false); setNewWizardName(''); setNewWizardAvatar(''); }}>取消</Text>
+                  <Text className='modal-cancel' onClick={() => { setShowAddWizard(false); setNewWizardName(''); setNewWizardAvatar(''); }}>返回</Text>
                   <Text className='modal-confirm' onClick={handleAddWizardToRoom}>确认添加</Text>
                 </View>
               </>

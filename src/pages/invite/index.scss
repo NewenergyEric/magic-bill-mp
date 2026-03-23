@@ -81,6 +81,45 @@
   font-weight: bold;
 }
 
+.members-preview {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: rgba($magic-gold, 0.08);
+  border-radius: 12rpx;
+}
+
+.preview-label {
+  font-size: 24rpx;
+  color: rgba($ink, 0.5);
+  margin-bottom: 15rpx;
+  display: block;
+}
+
+.members-scroll {
+  white-space: nowrap;
+}
+
+.member-preview-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 25rpx;
+  vertical-align: top;
+}
+
+.member-avatar-small {
+  margin-bottom: 8rpx;
+}
+
+.member-name-small {
+  font-size: 22rpx;
+  color: $ink;
+  max-width: 100rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .invite-desc {
   font-size: 30rpx;
   color: $ink;
