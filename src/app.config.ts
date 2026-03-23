@@ -8,6 +8,7 @@ export default defineAppConfig({
     'pages/history/index',
     'pages/companions/index',
     'pages/share/index',
+    'pages/invite/index',
     'pages/contract/index',
     'pages/test/index'
   ],

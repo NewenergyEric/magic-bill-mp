@@ -25,6 +25,7 @@ import { shareEvent } from '@/services/share'
 import { createContract, cloudLogin, getContractDetail } from '@/services/cloud'
 import { formatAmount } from '@/utils/settlement'
 import { onWizardInfoChanged, WizardInfoChangeData } from '@/services/events'
+import { WIZARDS } from '@/constants/wizards'
 import WizardAvatar from '@/components/WizardAvatar'
 import NewbieGuide, { shouldShowGuide } from '@/components/NewbieGuide'
 import UserLogin from '@/components/UserLogin'
@@ -52,7 +53,6 @@ export default function LedgerPage() {
   // 创建子收支录
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newSubLedgerName, setNewSubLedgerName] = useState('')
-  const [enableCloudSync, setEnableCloudSync] = useState(false)  // 云端同步开关
   
   // 编辑子收支录名称
   const [showEditModal, setShowEditModal] = useState(false)
@@ -155,75 +155,53 @@ export default function LedgerPage() {
     loadData()
   }
 
-  // 发送微信邀请（自动创建云端契约并直接分享）
+  // 发送微信邀请（自动创建云端契约并使用小程序分享）
   const handleSendInvite = async () => {
     const subLedger = currentInviteSubLedger
     if (!subLedger) return
 
     setCreatingContract(true)
     try {
+      // 先确保登录
+      const loginResult = await cloudLogin()
+      if (!loginResult.success || !loginResult.data) {
+        Taro.showToast({ title: '请先登录', icon: 'none' })
+        setCreatingContract(false)
+        return
+      }
+
       // 如果还没有cloudId，先创建云端契约
-      if (!subLedger.cloudId) {
-        const loginResult = await cloudLogin()
-        if (!loginResult.success || !loginResult.data) {
-          Taro.showToast({ title: '请先登录', icon: 'none' })
+      let contractId = subLedger.cloudId
+      let inviteCode = currentInviteCode
+
+      if (!contractId) {
+        const contractResult = await createContract(subLedger.name)
+        if (contractResult.success && contractResult.data?.contract) {
+          contractId = contractResult.data.contract._id
+          inviteCode = contractResult.data.contract.inviteCode || ''
+          // 更新本地事件的cloudId
+          updateSubLedger(subLedger._id, { cloudId: contractId })
+          setCurrentInviteSubLedger({ ...subLedger, cloudId: contractId })
+          setCurrentInviteCode(inviteCode)
+          loadData()
+        } else {
+          Taro.showToast({ title: '创建共享失败', icon: 'none' })
           setCreatingContract(false)
           return
         }
+      } else if (!inviteCode) {
+        const res = await getContractDetail(contractId)
+        if (res.success && res.data?.contract?.inviteCode) {
+          inviteCode = res.data.contract.inviteCode
+          setCurrentInviteCode(inviteCode)
+        }
+      }
 
-        const contractResult = await createContract(subLedger.name)
-        if (contractResult.success && contractResult.data?.contract) {
-          // 更新本地事件的cloudId
-          updateSubLedger(subLedger._id, { cloudId: contractResult.data.contract._id })
-          setCurrentInviteSubLedger({ ...subLedger, cloudId: contractResult.data.contract._id })
-          setCurrentInviteCode(contractResult.data.contract.inviteCode || '')
-          Taro.showToast({ title: '已开启云端共享', icon: 'success' })
-          loadData()
-          
-          // 直接复制链接并提示用户分享
-          const inviteCode = contractResult.data.contract.inviteCode
-          if (inviteCode) {
-            const shareLink = `magic-bill://join?code=${inviteCode}`
-            Taro.setClipboardData({
-              data: shareLink,
-              success: () => {
-                Taro.showModal({
-                  title: '邀请链接已复制',
-                  content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可邀请加入「${subLedger.name}」`,
-                  showCancel: false,
-                  confirmText: '知道了'
-                })
-              }
-            })
-          }
-        } else {
-          Taro.showToast({ title: '开启共享失败', icon: 'none' })
-        }
-      } else {
-        // 已有cloudId，获取邀请码并生成链接
-        let inviteCode = currentInviteCode
-        if (!inviteCode) {
-          const res = await getContractDetail(subLedger.cloudId)
-          if (res.success && res.data?.contract) {
-            inviteCode = res.data.contract.inviteCode || ''
-            setCurrentInviteCode(inviteCode)
-          }
-        }
-        
-        if (inviteCode) {
-          const shareLink = `magic-bill://join?code=${inviteCode}`
-          Taro.setClipboardData({
-            data: shareLink,
-            success: () => {
-              Taro.showModal({
-                title: '邀请链接已复制',
-                content: `链接 ${shareLink} 已复制到剪贴板，发送给微信好友即可邀请加入「${subLedger.name}」`,
-                showCancel: false,
-                confirmText: '知道了'
-              })
-            }
-          })
-        }
+      // 跳转到分享页面
+      if (inviteCode) {
+        Taro.navigateTo({
+          url: `/pages/share/index?code=${inviteCode}&name=${encodeURIComponent(subLedger.name)}`
+        })
       }
     } catch (e) {
       console.error('[Invite] 创建云端契约失败', e)
@@ -344,20 +322,16 @@ export default function LedgerPage() {
       return
     }
 
-    // 先确保登录（获取用户信息）
-    const loginResult = await cloudLogin()
-
     // 创建本地事件，创建者作为第一个成员
     const newSubLedger = createSubLedger(
       newSubLedgerName.trim(),
-      loginResult.data?.userId,
+      undefined,  // 暂不关联云端ID
       userCompanion?.name || '创建者',
       userCompanion?.avatar || '🧙'
     )
 
     setShowCreateModal(false)
     setNewSubLedgerName('')
-    setEnableCloudSync(false)
     loadData()
 
     Taro.showToast({ title: '创建成功', icon: 'success' })
@@ -1225,24 +1199,8 @@ export default function LedgerPage() {
               onInput={(e) => setNewSubLedgerName(e.detail.value)}
               placeholder='请输入事件名称'
             />
-            {/* 云端同步开关 */}
-            <View className='cloud-sync-toggle' onClick={() => setEnableCloudSync(!enableCloudSync)}>
-              <View className='toggle-left'>
-                <Text className='toggle-icon'>📜</Text>
-                <View className='toggle-text'>
-                  <Text className='toggle-title'>共享事件</Text>
-                  <Text className='toggle-desc'>开启后可邀请微信好友共同记账</Text>
-                </View>
-              </View>
-              <View className={`toggle-switch ${enableCloudSync ? 'active' : ''}`}>
-                <View className='toggle-knob' />
-              </View>
-            </View>
             <View className='modal-actions'>
-              <Text className='modal-cancel' onClick={() => {
-                setShowCreateModal(false)
-                setEnableCloudSync(false)
-              }}>取消</Text>
+              <Text className='modal-cancel' onClick={() => setShowCreateModal(false)}>取消</Text>
               <Text className='modal-confirm' onClick={confirmCreate}>施法创建</Text>
             </View>
           </View>
@@ -1252,13 +1210,31 @@ export default function LedgerPage() {
       {/* 邀请弹窗 */}
       {showInviteModal && (
         <View className='modal-mask' onClick={() => closeInviteModal()}>
-          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
+          <View className='modal-content invite-modal-large' onClick={(e) => e.stopPropagation()}>
             <Text className='modal-title'>📜 邀请巫师加入「{currentInviteSubLedger?.name}」</Text>
+
+            {/* 已添加的成员列表 */}
+            {currentInviteSubLedger?.members && currentInviteSubLedger.members.length > 0 && (
+              <View className='members-section'>
+                <Text className='section-title'>已添加成员 ({currentInviteSubLedger.members.length})</Text>
+                <ScrollView scrollY className='members-list'>
+                  {currentInviteSubLedger.members.map((member, idx) => (
+                    <View key={member.id || idx} className='member-item-inline'>
+                      <View className='member-avatar'>
+                        <Text className='avatar-emoji'>{member.avatar || '🧙'}</Text>
+                      </View>
+                      <Text className='member-name'>{member.name}</Text>
+                      {member.type === 'wechat' && <Text className='wechat-badge'>微信</Text>}
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
 
             {/* 添加自定义巫师 */}
             {!showAddWizard ? (
               <>
-                <Text className='modal-hint'>添加巫师或发送微信邀请</Text>
+                <Text className='modal-hint'>选择添加方式</Text>
 
                 <View className='invite-actions'>
                   {/* 添加自定义巫师按钮 */}
@@ -1270,46 +1246,38 @@ export default function LedgerPage() {
                   {/* 发送微信邀请按钮 */}
                   <View className={`invite-action-btn ${creatingContract ? 'disabled' : ''}`} onClick={creatingContract ? undefined : handleSendInvite}>
                     <Text className='action-icon'>📱</Text>
-                    <Text className='action-text'>{creatingContract ? '创建中...' : '发送微信邀请'}</Text>
+                    <Text className='action-text'>{creatingContract ? '创建中...' : '邀请微信好友'}</Text>
                   </View>
                 </View>
-
-                {/* 如果已有邀请码，显示邀请链接 */}
-                {currentInviteCode && (
-                  <View className='invite-link-section'>
-                    <Text className='section-label'>邀请链接</Text>
-                    <View className='invite-link-box'>
-                      <Text className='invite-link'>magic-bill://join?code={currentInviteCode}</Text>
-                    </View>
-                    <View className='copy-btn' onClick={handleCopyInviteLink}>
-                      <Text className='copy-btn-text'>复制链接</Text>
-                    </View>
-                  </View>
-                )}
               </>
             ) : (
               <>
                 {/* 添加巫师表单 */}
-                <Text className='modal-hint'>设置巫师名字和头像</Text>
+                <Text className='modal-hint'>设置巫师头像和名字</Text>
+                
+                {/* 头像选择 */}
+                <View className='avatar-picker-grid'>
+                  {WIZARDS.map((w) => (
+                    <View
+                      key={w.avatar}
+                      className={`avatar-option-grid ${newWizardAvatar === w.avatar ? 'selected' : ''}`}
+                      onClick={() => setNewWizardAvatar(w.avatar)}
+                    >
+                      <WizardAvatar name={w.avatar} />
+                    </View>
+                  ))}
+                </View>
+                
+                {/* 名字输入 */}
                 <Input
                   className='modal-input'
                   value={newWizardName}
                   onInput={(e) => setNewWizardName(e.detail.value)}
                   placeholder='输入巫师名字'
                 />
-                <View className='avatar-picker'>
-                  {['🧙', '🧝', '🧚', '🦹', '🧛', '🧜'].map(emoji => (
-                    <View
-                      key={emoji}
-                      className={`avatar-option ${newWizardAvatar === emoji ? 'selected' : ''}`}
-                      onClick={() => setNewWizardAvatar(emoji)}
-                    >
-                      <Text className='avatar-emoji'>{emoji}</Text>
-                    </View>
-                  ))}
-                </View>
+                
                 <View className='modal-actions'>
-                  <Text className='modal-cancel' onClick={() => setShowAddWizard(false)}>取消</Text>
+                  <Text className='modal-cancel' onClick={() => { setShowAddWizard(false); setNewWizardName(''); setNewWizardAvatar(''); }}>取消</Text>
                   <Text className='modal-confirm' onClick={handleAddWizardToRoom}>确认添加</Text>
                 </View>
               </>
@@ -1317,7 +1285,7 @@ export default function LedgerPage() {
 
             {/* 底部关闭按钮 */}
             <View className='modal-close-hint' onClick={closeInviteModal}>
-              <Text className='close-hint-text'>稍后再说</Text>
+              <Text className='close-hint-text'>完成</Text>
             </View>
           </View>
         </View>

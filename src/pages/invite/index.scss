@@ -1,0 +1,190 @@
+@import '@/styles/variables.scss';
+
+.invite-page {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.invite-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, $dark-purple 0%, $magic-navy 100%);
+  z-index: 0;
+}
+
+.invite-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 30%, rgba($magic-gold, 0.1) 0%, transparent 60%);
+}
+
+.invite-content {
+  position: relative;
+  z-index: 1;
+  padding: 80rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.invite-header {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.invite-icon {
+  font-size: 100rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.invite-title {
+  font-size: 48rpx;
+  color: $magic-gold;
+  font-weight: bold;
+  text-shadow: 0 0 20rpx rgba($magic-gold, 0.3);
+}
+
+.invite-card {
+  width: 100%;
+  background: rgba($parchment, 0.95);
+  border-radius: 24rpx;
+  padding: 50rpx 40rpx;
+  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.3);
+}
+
+.event-name {
+  text-align: center;
+  margin-bottom: 40rpx;
+  padding-bottom: 30rpx;
+  border-bottom: 2rpx solid rgba($magic-gold, 0.2);
+}
+
+.name-label {
+  font-size: 24rpx;
+  color: rgba($ink, 0.5);
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.name-text {
+  font-size: 40rpx;
+  color: $magic-gold;
+  font-weight: bold;
+}
+
+.invite-desc {
+  font-size: 30rpx;
+  color: $ink;
+  text-align: center;
+  line-height: 1.8;
+  margin-bottom: 40rpx;
+}
+
+.invite-actions {
+  margin-bottom: 30rpx;
+}
+
+.join-btn {
+  width: 100%;
+  height: 90rpx;
+  background: linear-gradient(135deg, $magic-gold 0%, darken($magic-gold, 10%) 100%);
+  border-radius: 45rpx;
+  font-size: 34rpx;
+  color: $dark-purple;
+  font-weight: bold;
+  border: none;
+  
+  &:active {
+    opacity: 0.9;
+  }
+  
+  &[disabled] {
+    opacity: 0.6;
+  }
+}
+
+.share-section {
+  text-align: center;
+}
+
+.share-btn {
+  background: transparent;
+  border: 2rpx solid rgba($magic-gold, 0.5);
+  border-radius: 45rpx;
+  padding: 20rpx 40rpx;
+  
+  &::after {
+    border: none;
+  }
+}
+
+.share-btn-text {
+  font-size: 28rpx;
+  color: $magic-gold;
+}
+
+.success-icon {
+  font-size: 100rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.success-text {
+  font-size: 40rpx;
+  color: $magic-gold;
+  font-weight: bold;
+  text-align: center;
+  display: block;
+  margin-bottom: 15rpx;
+}
+
+.success-hint {
+  font-size: 28rpx;
+  color: rgba($ink, 0.6);
+  text-align: center;
+  display: block;
+  margin-bottom: 40rpx;
+}
+
+.go-home-btn {
+  width: 100%;
+  height: 90rpx;
+  background: linear-gradient(135deg, $magic-burgundy 0%, darken($magic-burgundy, 10%) 100%);
+  border-radius: 45rpx;
+  font-size: 34rpx;
+  color: $parchment;
+  font-weight: bold;
+  border: none;
+}
+
+.features {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 60rpx;
+  width: 100%;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.feature-icon {
+  font-size: 48rpx;
+}
+
+.feature-text {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.7);
+}
