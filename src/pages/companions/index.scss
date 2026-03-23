@@ -753,3 +753,107 @@ $ink: #2c1e1a;
   font-size: 28rpx;
   color: rgba($parchment, 0.6);
 }
+
+// ========== 底部弹出样式 ==========
+.bottom-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bottom-sheet {
+  width: 100%;
+  background: #1a0f0a;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 24rpx 32rpx 60rpx;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.sheet-handle {
+  width: 80rpx;
+  height: 8rpx;
+  background: rgba($magic-gold, 0.3);
+  border-radius: 4rpx;
+  margin: 0 auto 24rpx;
+}
+
+.sheet-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: $magic-gold;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.sheet-action-btn {
+  display: flex;
+  align-items: center;
+  padding: 28rpx;
+  background: rgba($magic-gold, 0.08);
+  border: 2rpx solid rgba($magic-gold, 0.2);
+  border-radius: 16rpx;
+
+  &:active {
+    background: rgba($magic-gold, 0.15);
+  }
+}
+
+.sheet-icon {
+  font-size: 56rpx;
+  margin-right: 24rpx;
+}
+
+.sheet-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.sheet-action-title {
+  font-size: 32rpx;
+  color: $parchment;
+  font-weight: bold;
+}
+
+.sheet-action-desc {
+  font-size: 24rpx;
+  color: rgba($parchment, 0.6);
+}
+
+.sheet-cancel {
+  text-align: center;
+  padding: 28rpx;
+  margin-top: 24rpx;
+  background: rgba($parchment, 0.05);
+  border-radius: 16rpx;
+
+  &:active {
+    background: rgba($parchment, 0.1);
+  }
+}
+
+.cancel-text {
+  font-size: 30rpx;
+  color: rgba($parchment, 0.8);
+}

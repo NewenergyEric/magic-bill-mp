@@ -1207,23 +1207,22 @@ export default function LedgerPage() {
         </View>
       )}
 
-      {/* 邀请弹窗 */}
+      {/* 邀请弹窗 - 底部弹出 */}
       {showInviteModal && (
-        <View className='modal-mask' onClick={() => closeInviteModal()}>
-          <View className='modal-content invite-modal-large' onClick={(e) => e.stopPropagation()}>
-            <Text className='modal-title'>📜 邀请巫师加入「{currentInviteSubLedger?.name}」</Text>
+        <View className='bottom-sheet-overlay' onClick={() => closeInviteModal()}>
+          <View className='bottom-sheet invite-sheet' onClick={(e) => e.stopPropagation()}>
+            <View className='sheet-handle' />
+            <Text className='sheet-title'>📜 邀请巫师加入「{currentInviteSubLedger?.name}」</Text>
 
             {/* 已添加的成员列表 */}
             {currentInviteSubLedger?.members && currentInviteSubLedger.members.length > 0 && (
-              <View className='members-section'>
-                <Text className='section-title'>已添加成员 ({currentInviteSubLedger.members.length})</Text>
-                <ScrollView scrollY className='members-list'>
+              <View className='sheet-members'>
+                <Text className='sheet-members-label'>已添加成员 ({currentInviteSubLedger.members.length})</Text>
+                <ScrollView scrollX className='members-scroll-x'>
                   {currentInviteSubLedger.members.map((member, idx) => (
-                    <View key={member.id || idx} className='member-item-inline'>
-                      <View className='member-avatar'>
-                        <Text className='avatar-emoji'>{member.avatar || '🧙'}</Text>
-                      </View>
-                      <Text className='member-name'>{member.name}</Text>
+                    <View key={member.id || idx} className='member-chip'>
+                      <WizardAvatar name={member.avatar || '🧙'} size='small' />
+                      <Text className='chip-name'>{member.name}</Text>
                       {member.type === 'wechat' && <Text className='wechat-badge'>微信</Text>}
                     </View>
                   ))}
@@ -1233,41 +1232,28 @@ export default function LedgerPage() {
 
             {/* 添加自定义巫师 */}
             {!showAddWizard ? (
-              <>
-                <Text className='modal-hint'>选择添加方式</Text>
-
-                <View className='invite-actions'>
-                  {/* 添加自定义巫师按钮 */}
-                  <View className='invite-action-btn' onClick={() => setShowAddWizard(true)}>
-                    <Text className='action-icon'>🧙</Text>
-                    <Text className='action-text'>添加自定义巫师</Text>
-                  </View>
-
-                  {/* 发送微信邀请按钮 */}
-                  <View className={`invite-action-btn ${creatingContract ? 'disabled' : ''}`} onClick={creatingContract ? undefined : handleSendInvite}>
-                    <Text className='action-icon'>📱</Text>
-                    <Text className='action-text'>{creatingContract ? '创建中...' : '邀请微信好友'}</Text>
+              <View className='sheet-actions'>
+                {/* 添加自定义巫师按钮 */}
+                <View className='sheet-action-btn' onClick={() => setShowAddWizard(true)}>
+                  <Text className='sheet-icon'>🧙</Text>
+                  <View className='sheet-text'>
+                    <Text className='sheet-action-title'>添加自定义巫师</Text>
+                    <Text className='sheet-action-desc'>创建虚拟伙伴参与记账</Text>
                   </View>
                 </View>
-              </>
+
+                {/* 发送微信邀请按钮 */}
+                <View className={`sheet-action-btn ${creatingContract ? 'disabled' : ''}`} onClick={creatingContract ? undefined : handleSendInvite}>
+                  <Text className='sheet-icon'>📱</Text>
+                  <View className='sheet-text'>
+                    <Text className='sheet-action-title'>{creatingContract ? '创建中...' : '邀请微信好友'}</Text>
+                    <Text className='sheet-action-desc'>好友点击链接即可加入</Text>
+                  </View>
+                </View>
+              </View>
             ) : (
               <>
-                {/* 添加巫师表单 - 先显示已添加成员 */}
-                {currentInviteSubLedger?.members && currentInviteSubLedger.members.length > 0 && (
-                  <View className='existing-members-inline'>
-                    <Text className='inline-label'>已添加：</Text>
-                    <ScrollView scrollX className='members-scroll-x'>
-                      {currentInviteSubLedger.members.map((member, idx) => (
-                        <View key={member.id || idx} className='member-chip'>
-                          <WizardAvatar name={member.avatar || '🧙'} size='small' />
-                          <Text className='chip-name'>{member.name}</Text>
-                        </View>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )}
-                
-                <Text className='modal-hint'>选择头像和输入名字</Text>
+                <Text className='sheet-hint'>选择头像和输入名字</Text>
                 
                 {/* 头像选择 */}
                 <ScrollView scrollY className='avatar-scroll'>
@@ -1292,16 +1278,15 @@ export default function LedgerPage() {
                   placeholder='输入巫师名字'
                 />
                 
-                <View className='modal-actions'>
-                  <Text className='modal-cancel' onClick={() => { setShowAddWizard(false); setNewWizardName(''); setNewWizardAvatar(''); }}>返回</Text>
-                  <Text className='modal-confirm' onClick={handleAddWizardToRoom}>确认添加</Text>
+                <View className='sheet-form-actions'>
+                  <Text className='sheet-cancel-btn' onClick={() => { setShowAddWizard(false); setNewWizardName(''); setNewWizardAvatar(''); }}>返回</Text>
+                  <Text className='sheet-confirm-btn' onClick={handleAddWizardToRoom}>确认添加</Text>
                 </View>
               </>
             )}
 
-            {/* 底部关闭按钮 */}
-            <View className='modal-close-hint' onClick={closeInviteModal}>
-              <Text className='close-hint-text'>完成</Text>
+            <View className='sheet-close' onClick={closeInviteModal}>
+              <Text className='close-text'>完成</Text>
             </View>
           </View>
         </View>

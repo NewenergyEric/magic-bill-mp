@@ -289,35 +289,35 @@ export default function CompanionsPage() {
         <Text className='add-icon'>+ 添加新伙伴</Text>
       </View>
 
-      {/* 添加方式选择弹窗 */}
+      {/* 添加方式选择弹窗 - 底部弹出 */}
       {showAddPicker && (
-        <View className='modal-mask' onClick={() => setShowAddPicker(false)}>
-          <View className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <Text className='modal-title'>🧙 添加伙伴</Text>
-            <Text className='modal-hint'>选择添加方式</Text>
-
-            <View className='add-picker-actions'>
+        <View className='bottom-sheet-overlay' onClick={() => setShowAddPicker(false)}>
+          <View className='bottom-sheet' onClick={(e) => e.stopPropagation()}>
+            <View className='sheet-handle' />
+            <Text className='sheet-title'>添加伙伴</Text>
+            
+            <View className='sheet-actions'>
               {/* 添加自定义巫师 */}
-              <View className='add-picker-btn' onClick={() => { setShowAddPicker(false); setShowAddForm(true); }}>
-                <Text className='picker-icon'>🧙</Text>
-                <View className='picker-text'>
-                  <Text className='picker-title'>自定义巫师</Text>
-                  <Text className='picker-desc'>创建虚拟伙伴，仅自己可见</Text>
+              <View className='sheet-action-btn' onClick={() => { setShowAddPicker(false); setShowAddForm(true); }}>
+                <Text className='sheet-icon'>🧙</Text>
+                <View className='sheet-text'>
+                  <Text className='sheet-action-title'>自定义巫师</Text>
+                  <Text className='sheet-action-desc'>创建虚拟伙伴，仅自己可见</Text>
                 </View>
               </View>
 
               {/* 邀请微信好友 */}
-              <View className='add-picker-btn' onClick={handleInviteWechatFriend}>
-                <Text className='picker-icon'>📱</Text>
-                <View className='picker-text'>
-                  <Text className='picker-title'>邀请微信好友</Text>
-                  <Text className='picker-desc'>好友点击链接即可加入，可共同管理账单</Text>
+              <View className='sheet-action-btn' onClick={handleInviteWechatFriend}>
+                <Text className='sheet-icon'>📱</Text>
+                <View className='sheet-text'>
+                  <Text className='sheet-action-title'>邀请微信好友</Text>
+                  <Text className='sheet-action-desc'>好友点击链接即可加入</Text>
                 </View>
               </View>
             </View>
 
-            <View className='modal-close-hint' onClick={() => setShowAddPicker(false)}>
-              <Text className='close-hint-text'>取消</Text>
+            <View className='sheet-cancel' onClick={() => setShowAddPicker(false)}>
+              <Text className='cancel-text'>取消</Text>
             </View>
           </View>
         </View>
